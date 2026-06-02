@@ -2250,5 +2250,5 @@ async def on_ready():
     print(f'📢 Bot on {len(bot.guilds)} servers')
 
 
-TOKEN = 'MTUxMDk5ODI4MjI1NDU0OTAxMg.GZaGA1.GdLyzAv9nMfOfPoHSuQcUw3ZWvZHhZS8kEVYyc'
+TOKEN = ''
 bot.run(TOKEN)
