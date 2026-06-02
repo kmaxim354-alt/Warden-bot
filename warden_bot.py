@@ -43,29 +43,6 @@ def get_text(guild_id, key, *args):
             'info_desc': 'Бот-хранитель для твоего сервера',
             'info_version': 'Версия',
             'info_cmds': 'Команды',
-            'report_staff_ticket_setup': '✅ Система жалоб на персонал настроена!',
-            'partnership_ticket_setup': '✅ Система партнёрства настроена!',
-            'report_staff_title': '⚠️ Жалобы на персонал',
-            'report_staff_desc': 'Если вы столкнулись с неправомерными действиями сотрудника сервера, нажмите на кнопку ниже, чтобы подать жалобу.\n\n**Внимание:** Ложные жалобы могут привести к наказанию!',
-            'report_staff_button': '📝 Пожаловаться на персонал',
-            'report_staff_modal_title': '📝 Жалоба на персонал',
-            'report_staff_against': 'На кого жалуетесь?',
-            'report_staff_reason': 'Причина жалобы',
-            'report_staff_proof': 'Доказательства',
-            'report_staff_submitted': '✅ Ваша жалоба отправлена! Сотрудники рассмотрят её в ближайшее время.',
-            'report_staff_embed_title': '⚠️ ЖАЛОБА НА ПЕРСОНАЛ',
-            'report_staff_embed_footer': 'Пожалуйста, рассмотрите жалобу в ближайшее время',
-            'partnership_title': '🤝 Сотрудничество',
-            'partnership_desc': 'Если вы хотите предложить сотрудничество, рекламу или совместные ивенты, нажмите на кнопку ниже.\n\nМы рассмотрим все предложения!',
-            'partnership_button': '🤝 Предложить сотрудничество',
-            'partnership_modal_title': '🤝 Предложение сотрудничества',
-            'partnership_server_name': 'Название сервера/проекта',
-            'partnership_type': 'Тип сотрудничества',
-            'partnership_description': 'Описание',
-            'partnership_links': 'Ссылки',
-            'partnership_contacts': 'Контакты для связи',
-            'partnership_submitted': '✅ Ваше предложение отправлено! Мы рассмотрим его в ближайшее время.',
-            'partnership_embed_title': '🤝 НОВОЕ ПРЕДЛОЖЕНИЕ СОТРУДНИЧЕСТВА',
             'info_footer': 'Всегда поддерживает порядок 🔒',
             'no_permission': '❌ Нет прав!',
             'need_admin': '❌ Нужны права администратора!',
@@ -74,6 +51,29 @@ def get_text(guild_id, key, *args):
             'no_roles': '❌ Роли не указаны!',
             'settings_saved': '✅ Настройки сохранены',
             'log_channel_set': '✅ Канал логов: {}',
+            'report_staff_ticket_setup': '✅ Система жалоб на персонал настроена!',
+            'report_staff_title': '⚠️ Жалобы на персонал',
+            'report_staff_desc': 'Если вы столкнулись с неправомерными действиями сотрудника сервера, нажмите на кнопку ниже, чтобы подать жалобу.\n\n**Внимание:** Ложные жалобы могут привести к наказанию!',
+            'report_staff_button': '📝 Пожаловаться на персонал',
+            'report_staff_modal_title': '📝 Жалоба на персонал',
+            'report_staff_against': 'На кого жалуетесь?',
+            'report_staff_reason': 'Причина жалобы',
+            'report_staff_proof': 'Доказательства (ссылки на скриншоты)',
+            'report_staff_submitted': '✅ Ваша жалоба отправлена! Сотрудники рассмотрят её в ближайшее время.',
+            'report_staff_embed_title': '⚠️ ЖАЛОБА НА ПЕРСОНАЛ',
+            'report_staff_embed_footer': 'Пожалуйста, рассмотрите жалобу',
+            'partnership_ticket_setup': '✅ Система партнёрства настроена!',
+            'partnership_title': '🤝 Сотрудничество',
+            'partnership_desc': 'Если вы хотите предложить сотрудничество, рекламу или совместные ивенты, нажмите на кнопку ниже.\n\nМы рассмотрим все предложения!',
+            'partnership_button': '🤝 Предложить сотрудничество',
+            'partnership_modal_title': '🤝 Предложение сотрудничества',
+            'partnership_server_name': 'Название сервера/проекта',
+            'partnership_type': 'Тип сотрудничества',
+            'partnership_description': 'Описание',
+            'partnership_links': 'Ссылки (сервер, соцсети)',
+            'partnership_contacts': 'Контакты для связи',
+            'partnership_submitted': '✅ Ваше предложение отправлено! Мы рассмотрим его в ближайшее время.',
+            'partnership_embed_title': '🤝 НОВОЕ ПРЕДЛОЖЕНИЕ СОТРУДНИЧЕСТВА',
             'welcome_configured': '✅ Приветствия настроены в {}',
             'photo_welcome_configured': '✅ Фото-приветствие настроено!',
             'welcome_disabled': '✅ Приветствия отключены',
@@ -197,6 +197,63 @@ def get_text(guild_id, key, *args):
             'flip_heads': 'Орёл',
             'flip_tails': 'Решка',
             'none': 'Нет',
+            'ticket_system_setup': '✅ Система тикетов настроена!',
+            'ticket_system_title': '🎫 Система тикетов',
+            'ticket_system_desc': 'Нажми на кнопку ниже, чтобы создать тикет.\nНаши сотрудники свяжутся с тобой в ближайшее время.',
+            'ticket_create_button': '🎫 Создать тикет',
+            'ticket_creating': 'Создание тикета...',
+            'ticket_created_channel': '✅ Тикет создан: {}',
+            'ticket_close_button': '🔒 Закрыть тикет',
+            'ticket_closing': 'Закрытие тикета...',
+            'ticket_closed': '✅ Тикет закрыт',
+            'ticket_embed_title': '🎫 Тикет создан',
+            'ticket_embed_desc': '{}, опишите вашу проблему.\nСотрудники скоро ответят вам.',
+            'ticket_dm_closed': '✅ Ваш тикет **{}** был закрыт сотрудником {}.',
+            'application_created': '✅ Заявка создана! Кнопка отправлена в канал.',
+            'application_no_questions': '❌ Добавь хотя бы 1 вопрос!',
+            'application_question_added': '✅ Вопрос добавлен! (Всего: {})',
+            'application_button_label': '📝 Подать заявку: {}',
+            'application_embed_title': '📝 {}',
+            'application_embed_desc': 'Нажми на кнопку ниже, чтобы подать заявку.\nПосле проверки ты получишь роль {}',
+            'application_creation_title': '📝 Создание заявки',
+            'application_creation_desc': '**Название:** {}\n**Роль:** {}\n**Канал отправки:** {}\n\nНажми на кнопки ниже, чтобы добавить вопросы.',
+            'application_add_question_button': '➕ Добавить вопрос',
+            'application_finish_button': '✅ Завершить создание',
+            'application_submit_button': '📝 Подать заявку: {}',
+            'application_modal_title': '📝 {}',
+            'application_submitted': '✅ Заявка отправлена! Ожидай решения.',
+            'application_new_title': '📥 Новая заявка: {}',
+            'application_new_desc': '**От:** {}\n**ID:** {}\n**Статус:** ⏳ Ожидает рассмотрения',
+            'application_question_field': '❓ Вопрос {}',
+            'application_footer': 'ID заявки: {}',
+            'application_approve_button': '✅ Принять',
+            'application_reject_button': '❌ Отказать',
+            'application_approve_msg_button': '✏️ Принять с сообщением',
+            'application_reject_msg_button': '📝 Отказать с сообщением',
+            'application_approved': '✅ Заявка одобрена! {} получил роль {}',
+            'application_approved_simple': '✅ Заявка одобрена!',
+            'application_rejected': '❌ Заявка отклонена!',
+            'application_approved_with_msg': '✅ Заявка одобрена с сообщением!',
+            'application_rejected_with_msg': '❌ Заявка отклонена с сообщением!',
+            'application_status_approved': '✅ ПРИНЯТА',
+            'application_status_rejected': '❌ ОТКЛОНЕНА',
+            'application_status_approved_msg': '✅ ПРИНЯТА (с сообщением)',
+            'application_status_rejected_msg': '❌ ОТКАЗАНО (с сообщением)',
+            'application_reviewed_by': '✅ Рассмотрел',
+            'application_reviewed_by_reject': '❌ Рассмотрел',
+            'application_review_message': '📝 Сообщение',
+            'application_reject_reason': '📝 Причина отказа',
+            'application_dm_approved': '✅ Ваша заявка **{}** была **ОДОБРЕНА**! Вы получили роль {}',
+            'application_dm_rejected': '❌ Ваша заявка **{}** была **ОТКЛОНЕНА**.',
+            'application_dm_approved_msg': '✅ Ваша заявка **{}** была **ОДОБРЕНА**! Вы получили роль {}\n\n**Сообщение от администрации:**\n{}',
+            'application_dm_rejected_msg': '❌ Ваша заявка **{}** была **ОТКЛОНЕНА**.\n\n**Причина:**\n{}',
+            'application_no_permission': '❌ Нет прав!',
+            'application_approve_modal_title': '✅ Принять заявку с сообщением',
+            'application_approve_modal_label': 'Сообщение пользователю',
+            'application_approve_modal_placeholder': 'Напишите сообщение для пользователя...',
+            'application_reject_modal_title': '❌ Отказать заявке с сообщением',
+            'application_reject_modal_label': 'Причина отказа',
+            'application_reject_modal_placeholder': 'Напишите причину отказа...',
         },
         'en': {
             'hello': 'Hello, {}! I am **Warden Bot** 🤖',
@@ -210,18 +267,32 @@ def get_text(guild_id, key, *args):
             'need_admin': '❌ Need admin permissions!',
             'error': '❌ Error: {}',
             'sent': '✅ Sent to {}',
+            'no_roles': '❌ No roles specified!',
+            'settings_saved': '✅ Settings saved',
             'report_staff_ticket_setup': '✅ Report staff ticket system setup!',
-            'partnership_ticket_setup': '✅ Partnership ticket system setup!',
             'report_staff_title': '⚠️ Report Staff',
             'report_staff_desc': 'If you have encountered misconduct by a staff member, click the button below to submit a report.\n\n**Warning:** False reports may result in punishment!',
             'report_staff_button': '📝 Report Staff',
             'report_staff_modal_title': '📝 Staff Report',
             'report_staff_against': 'Who are you reporting?',
             'report_staff_reason': 'Reason for report',
-            'report_staff_proof': 'Evidence',
+            'report_staff_proof': 'Evidence (screenshot links)',
             'report_staff_submitted': '✅ Your report has been submitted! Staff will review it shortly.',
             'report_staff_embed_title': '⚠️ STAFF REPORT',
-            'report_staff_embed_footer': 'Please review this report promptly',
+            'report_staff_embed_footer': 'Please review this report',
+            'ticket_system_setup': '✅ Ticket system setup!',
+            'ticket_system_title': '🎫 Ticket System',
+            'ticket_system_desc': 'Click the button below to create a ticket.\nOur staff will contact you shortly.',
+            'ticket_create_button': '🎫 Create Ticket',
+            'ticket_creating': 'Creating ticket...',
+            'ticket_created_channel': '✅ Ticket created: {}',
+            'ticket_close_button': '🔒 Close Ticket',
+            'ticket_closing': 'Closing ticket...',
+            'ticket_closed': '✅ Ticket closed',
+            'ticket_embed_title': '🎫 Ticket Created',
+            'ticket_embed_desc': '{}, describe your issue.\nStaff will respond shortly.',
+            'ticket_dm_closed': '✅ Your ticket **{}** was closed by staff member {}.',
+            'partnership_ticket_setup': '✅ Partnership ticket system setup!',
             'partnership_title': '🤝 Partnership',
             'partnership_desc': 'If you want to propose partnership, advertising, or joint events, click the button below.\n\nWe will review all proposals!',
             'partnership_button': '🤝 Propose Partnership',
@@ -229,12 +300,10 @@ def get_text(guild_id, key, *args):
             'partnership_server_name': 'Server/Project Name',
             'partnership_type': 'Partnership Type',
             'partnership_description': 'Description',
-            'partnership_links': 'Links',
+            'partnership_links': 'Links (server, social media)',
             'partnership_contacts': 'Contact Information',
             'partnership_submitted': '✅ Your proposal has been submitted! We will review it shortly.',
             'partnership_embed_title': '🤝 NEW PARTNERSHIP PROPOSAL',
-            'no_roles': '❌ No roles specified!',
-            'settings_saved': '✅ Settings saved',
             'log_channel_set': '✅ Log channel: {}',
             'welcome_configured': '✅ Welcome configured in {}',
             'photo_welcome_configured': '✅ Photo welcome configured!',
@@ -359,7 +428,52 @@ def get_text(guild_id, key, *args):
             'flip_heads': 'Heads',
             'flip_tails': 'Tails',
             'none': 'None',
-        }
+            'application_created': '✅ Application created! Button sent to channel.',
+            'application_no_questions': '❌ Add at least 1 question!',
+            'application_question_added': '✅ Question added! (Total: {})',
+            'application_button_label': '📝 Apply: {}',
+            'application_embed_title': '📝 {}',
+            'application_embed_desc': 'Click the button below to apply.\nAfter review you will receive the role {}',
+            'application_creation_title': '📝 Create Application',
+            'application_creation_desc': '**Name:** {}\n**Role:** {}\n**Send channel:** {}\n\nClick the buttons below to add questions.',
+            'application_add_question_button': '➕ Add Question',
+            'application_finish_button': '✅ Finish Creation',
+            'application_submit_button': '📝 Apply: {}',
+            'application_modal_title': '📝 {}',
+            'application_submitted': '✅ Application submitted! Await decision.',
+            'application_new_title': '📥 New Application: {}',
+            'application_new_desc': '**From:** {}\n**ID:** {}\n**Status:** ⏳ Pending review',
+            'application_question_field': '❓ Question {}',
+            'application_footer': 'Application ID: {}',
+            'application_approve_button': '✅ Approve',
+            'application_reject_button': '❌ Reject',
+            'application_approve_msg_button': '✏️ Approve with message',
+            'application_reject_msg_button': '📝 Reject with message',
+            'application_approved': '✅ Application approved! {} received role {}',
+            'application_approved_simple': '✅ Application approved!',
+            'application_rejected': '❌ Application rejected!',
+            'application_approved_with_msg': '✅ Application approved with message!',
+            'application_rejected_with_msg': '❌ Application rejected with message!',
+            'application_status_approved': '✅ APPROVED',
+            'application_status_rejected': '❌ REJECTED',
+            'application_status_approved_msg': '✅ APPROVED (with message)',
+            'application_status_rejected_msg': '❌ REJECTED (with message)',
+            'application_reviewed_by': '✅ Reviewed by',
+            'application_reviewed_by_reject': '❌ Reviewed by',
+            'application_review_message': '📝 Message',
+            'application_reject_reason': '📝 Reason',
+            'application_dm_approved': '✅ Your application **{}** has been **APPROVED**! You received the role {}',
+            'application_dm_rejected': '❌ Your application **{}** has been **REJECTED**.',
+            'application_dm_approved_msg': '✅ Your application **{}** has been **APPROVED**! You received the role {}\n\n**Message from staff:**\n{}',
+            'application_dm_rejected_msg': '❌ Your application **{}** has been **REJECTED**.\n\n**Reason:**\n{}',
+            'application_no_permission': '❌ No permission!',
+            'application_approve_modal_title': '✅ Approve application with message',
+            'application_approve_modal_label': 'Message to user',
+            'application_approve_modal_placeholder': 'Write a message for the user...',
+            'application_reject_modal_title': '❌ Reject application with message',
+            'application_reject_modal_label': 'Reason for rejection',
+            'application_reject_modal_placeholder': 'Write the reason for rejection...',
+        },
     }
     text = texts[lang].get(key, f'[{key}]')
     if args:
@@ -1658,7 +1772,8 @@ def save_applications(apps):
 
 
 @bot.tree.command(name='create-application', description='Создать новую заявку с вопросами')
-async def create_application(i: discord.Interaction, название: str, роль: discord.Role):
+async def create_application(i: discord.Interaction, название: str, роль: discord.Role,
+                             канал_отправки: discord.TextChannel):
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message('❌ Нет прав!', ephemeral=True)
 
@@ -1675,6 +1790,7 @@ async def create_application(i: discord.Interaction, название: str, ро
         'role_id': роль.id,
         'questions': [],
         'channel_id': i.channel_id,
+        'send_channel_id': канал_отправки.id,
         'creator_id': i.user.id
     }
     save_applications(apps)
@@ -1699,9 +1815,9 @@ async def create_application(i: discord.Interaction, название: str, ро
                 def __init__(self):
                     super().__init__(timeout=None)
 
-                @discord.ui.button(label=f'📝 Подать заявку: {название}', style=discord.ButtonStyle.primary)
+                @discord.ui.button(label=f'📝 Подать заявку: {название[:35]}', style=discord.ButtonStyle.primary)
                 async def apply(self, apply_i: discord.Interaction, button: discord.ui.Button):
-                    await apply_i.response.send_modal(ApplicationModal(app_id, gid))
+                    await apply_i.response.send_modal(ApplicationModal(app_id, gid, канал_отправки.id))
 
             embed = discord.Embed(
                 title=f'📝 {название}',
@@ -1719,7 +1835,7 @@ async def create_application(i: discord.Interaction, название: str, ро
             self.role = role
             self.gid = gid
             self.channel_id = channel_id
-            super().__init__(title=f'Добавить вопрос в "{app_name}"')
+            super().__init__(title='➕ Добавить вопрос')
             self.add_item(discord.ui.TextInput(label='Вопрос', style=discord.TextStyle.paragraph,
                                                placeholder='Напиши вопрос для заявки...'))
 
@@ -1735,88 +1851,213 @@ async def create_application(i: discord.Interaction, название: str, ро
             apps[self.gid][str(self.app_id)]['questions'].append(question)
             save_applications(apps)
 
-            await modal_i.response.send_message(
-                f'✅ Вопрос добавлен! (Всего: {len(apps[self.gid][str(self.app_id)]["questions"])})', ephemeral=True)
+            total = len(apps[self.gid][str(self.app_id)]['questions'])
+            await modal_i.response.send_message(f'✅ Вопрос добавлен! (Всего: {total})', ephemeral=True)
 
     embed = discord.Embed(
         title='📝 Создание заявки',
-        description=f'**Название:** {название}\n**Роль:** {роль.mention}\n\nНажми на кнопки ниже, чтобы добавить вопросы.',
+        description=f'**Название:** {название}\n**Роль:** {роль.mention}\n**Канал отправки:** {канал_отправки.mention}\n\nНажми на кнопки ниже, чтобы добавить вопросы.',
         color=discord.Color.green()
     )
     await i.response.send_message(embed=embed, view=AddQuestionView(), ephemeral=True)
 
 
 class ApplicationModal(discord.ui.Modal):
-    def __init__(self, app_id, guild_id):
+    def __init__(self, app_id, guild_id, send_channel_id):
         self.app_id = app_id
         self.guild_id = guild_id
+        self.send_channel_id = send_channel_id
         self.app_data = load_applications().get(guild_id, {}).get(str(app_id), {})
         self.questions = self.app_data.get('questions', [])
 
-        super().__init__(title=f'📝 {self.app_data.get("name", "Заявка")}')
+        app_name = self.app_data.get("name", "Заявка")[:40]
+        super().__init__(title=f'📝 {app_name}')
 
         for i, q in enumerate(self.questions[:5]):
-            self.add_item(discord.ui.TextInput(label=q[:45], style=discord.TextStyle.paragraph, required=True))
+            label = q[:45] if len(q) > 45 else q
+            self.add_item(discord.ui.TextInput(label=label, style=discord.TextStyle.paragraph, required=True))
 
     async def on_submit(self, interaction: discord.Interaction):
-
         app_data = load_applications().get(self.guild_id, {}).get(str(self.app_id), {})
         role_id = app_data.get('role_id')
         app_name = app_data.get('name', 'Заявка')
-
         role = interaction.guild.get_role(role_id) if role_id else None
+
+        send_channel = interaction.guild.get_channel(self.send_channel_id)
+        if not send_channel:
+            send_channel = interaction.channel
+
+        answers = []
+        for i, (q, a) in enumerate(zip(app_data.get('questions', []), self.children)):
+            answers.append({'question': q, 'answer': a.value})
+
+        all_apps = load_applications()
+        if 'submissions' not in all_apps:
+            all_apps['submissions'] = {}
+
+        submission_id = f"{self.guild_id}_{self.app_id}_{interaction.user.id}_{int(datetime.now().timestamp())}"
+        all_apps['submissions'][submission_id] = {
+            'guild_id': self.guild_id,
+            'app_id': self.app_id,
+            'user_id': interaction.user.id,
+            'user_name': str(interaction.user),
+            'answers': answers,
+            'status': 'pending',
+            'created_at': datetime.now().isoformat()
+        }
+        save_applications(all_apps)
 
         embed = discord.Embed(
             title=f'📥 Новая заявка: {app_name}',
-            description=f'От: {interaction.user.mention}\nID: {interaction.user.id}',
+            description=f'**От:** {interaction.user.mention}\n**ID:** {interaction.user.id}\n**Статус:** ⏳ Ожидает рассмотрения',
             color=discord.Color.blue(),
             timestamp=datetime.now()
         )
 
-        for i, (q, a) in enumerate(zip(app_data.get('questions', []), self.children)):
-            embed.add_field(name=f'❓ Вопрос {i + 1}', value=f'**{q[:50]}**\n{a.value[:500]}', inline=False)
+        for i, ans in enumerate(answers, 1):
+            embed.add_field(name=f'❓ Вопрос {i}', value=f'**{ans["question"][:50]}**\n{ans["answer"][:500]}',
+                            inline=False)
 
-        channel_id = app_data.get('channel_id')
-        channel = interaction.guild.get_channel(channel_id) if channel_id else interaction.channel
+        embed.set_footer(text=f'ID заявки: {submission_id}')
 
         class ReviewView(discord.ui.View):
             def __init__(self):
                 super().__init__(timeout=86400)
 
-            @discord.ui.button(label='✅ Принять', style=discord.ButtonStyle.success)
+            @discord.ui.button(label='✅ Принять', style=discord.ButtonStyle.success, emoji='✅')
             async def approve(self, btn_i: discord.Interaction, button: discord.ui.Button):
                 if not btn_i.user.guild_permissions.administrator:
                     return await btn_i.response.send_message('❌ Нет прав!', ephemeral=True)
+
+                all_apps = load_applications()
+                if 'submissions' in all_apps and submission_id in all_apps['submissions']:
+                    all_apps['submissions'][submission_id]['status'] = 'approved'
+                    all_apps['submissions'][submission_id]['reviewed_by'] = btn_i.user.id
+                    all_apps['submissions'][submission_id]['reviewed_at'] = datetime.now().isoformat()
+                    save_applications(all_apps)
+
                 if role:
                     await interaction.user.add_roles(role)
                     await btn_i.response.send_message(
                         f'✅ Заявка одобрена! {interaction.user.mention} получил роль {role.mention}', ephemeral=True)
                 else:
                     await btn_i.response.send_message('✅ Заявка одобрена!', ephemeral=True)
-                await btn_i.message.edit(view=None)
 
-            @discord.ui.button(label='❌ Отказать', style=discord.ButtonStyle.danger)
+                embed.color = discord.Color.green()
+                embed.description = f'**От:** {interaction.user.mention}\n**ID:** {interaction.user.id}\n**Статус:** ✅ ПРИНЯТА'
+                embed.add_field(name='✅ Рассмотрел', value=btn_i.user.mention, inline=False)
+                await btn_i.message.edit(embed=embed, view=None)
+
+                try:
+                    await interaction.user.send(
+                        f'✅ Ваша заявка **{app_name}** была **ОДОБРЕНА**! Вы получили роль {role.mention if role else ""}')
+                except:
+                    pass
+
+            @discord.ui.button(label='❌ Отказать', style=discord.ButtonStyle.danger, emoji='❌')
             async def reject(self, btn_i: discord.Interaction, button: discord.ui.Button):
                 if not btn_i.user.guild_permissions.administrator:
                     return await btn_i.response.send_message('❌ Нет прав!', ephemeral=True)
-                await btn_i.response.send_modal(RejectModal(interaction.user, btn_i.message))
 
-        class RejectModal(discord.ui.Modal):
-            def __init__(self, user, msg):
-                self.user = user
-                self.msg = msg
-                super().__init__(title='Причина отказа')
-                self.add_item(discord.ui.TextInput(label='Причина', style=discord.TextStyle.paragraph,
-                                                   placeholder='Укажите причину отказа...'))
+                all_apps = load_applications()
+                if 'submissions' in all_apps and submission_id in all_apps['submissions']:
+                    all_apps['submissions'][submission_id]['status'] = 'rejected'
+                    all_apps['submissions'][submission_id]['reviewed_by'] = btn_i.user.id
+                    all_apps['submissions'][submission_id]['reviewed_at'] = datetime.now().isoformat()
+                    save_applications(all_apps)
 
-            async def on_submit(self, modal_i: discord.Interaction):
-                reason = self.children[0].value
-                await self.user.send(f'❌ Ваша заявка **{app_name}** отклонена.\nПричина: {reason}')
-                await modal_i.response.send_message(f'❌ Заявка отклонена. Причина отправлена пользователю.',
-                                                    ephemeral=True)
-                await self.msg.edit(view=None)
+                await btn_i.response.send_message(f'❌ Заявка отклонена!', ephemeral=True)
 
-        await channel.send(role.mention if role else '', embed=embed, view=ReviewView())
+                embed.color = discord.Color.red()
+                embed.description = f'**От:** {interaction.user.mention}\n**ID:** {interaction.user.id}\n**Статус:** ❌ ОТКЛОНЕНА'
+                embed.add_field(name='❌ Рассмотрел', value=btn_i.user.mention, inline=False)
+                await btn_i.message.edit(embed=embed, view=None)
+
+                try:
+                    await interaction.user.send(f'❌ Ваша заявка **{app_name}** была **ОТКЛОНЕНА**.')
+                except:
+                    pass
+
+            @discord.ui.button(label='✏️ Принять с сообщением', style=discord.ButtonStyle.primary, emoji='✏️')
+            async def approve_with_message(self, btn_i: discord.Interaction, button: discord.ui.Button):
+                if not btn_i.user.guild_permissions.administrator:
+                    return await btn_i.response.send_message('❌ Нет прав!', ephemeral=True)
+
+                class ApproveMessageModal(discord.ui.Modal):
+                    def __init__(self):
+                        super().__init__(title='Принять заявку')
+                        self.add_item(discord.ui.TextInput(label='Сообщение', style=discord.TextStyle.paragraph,
+                                                           placeholder='Сообщение пользователю...', required=True))
+
+                    async def on_submit(self, modal_i: discord.Interaction):
+                        message_text = self.children[0].value
+
+                        all_apps = load_applications()
+                        if 'submissions' in all_apps and submission_id in all_apps['submissions']:
+                            all_apps['submissions'][submission_id]['status'] = 'approved_with_message'
+                            all_apps['submissions'][submission_id]['reviewed_by'] = modal_i.user.id
+                            all_apps['submissions'][submission_id]['review_message'] = message_text
+                            all_apps['submissions'][submission_id]['reviewed_at'] = datetime.now().isoformat()
+                            save_applications(all_apps)
+
+                        if role:
+                            await interaction.user.add_roles(role)
+
+                        embed.color = discord.Color.green()
+                        embed.description = f'**От:** {interaction.user.mention}\n**ID:** {interaction.user.id}\n**Статус:** ✅ ПРИНЯТА (с сообщением)'
+                        embed.add_field(name='✅ Рассмотрел', value=modal_i.user.mention, inline=False)
+                        embed.add_field(name='📝 Сообщение', value=message_text[:500], inline=False)
+                        await btn_i.message.edit(embed=embed, view=None)
+
+                        await modal_i.response.send_message(f'✅ Заявка одобрена с сообщением!', ephemeral=True)
+
+                        try:
+                            await interaction.user.send(
+                                f'✅ Ваша заявка **{app_name}** была **ОДОБРЕНА**! Вы получили роль {role.mention if role else ""}\n\n**Сообщение:**\n{message_text}')
+                        except:
+                            pass
+
+                await btn_i.response.send_modal(ApproveMessageModal())
+
+            @discord.ui.button(label='📝 Отказать с сообщением', style=discord.ButtonStyle.secondary, emoji='📝')
+            async def reject_with_message(self, btn_i: discord.Interaction, button: discord.ui.Button):
+                if not btn_i.user.guild_permissions.administrator:
+                    return await btn_i.response.send_message('❌ Нет прав!', ephemeral=True)
+
+                class RejectMessageModal(discord.ui.Modal):
+                    def __init__(self):
+                        super().__init__(title='Отказать заявке')
+                        self.add_item(discord.ui.TextInput(label='Причина', style=discord.TextStyle.paragraph,
+                                                           placeholder='Причина отказа...', required=True))
+
+                    async def on_submit(self, modal_i: discord.Interaction):
+                        message_text = self.children[0].value
+
+                        all_apps = load_applications()
+                        if 'submissions' in all_apps and submission_id in all_apps['submissions']:
+                            all_apps['submissions'][submission_id]['status'] = 'rejected_with_message'
+                            all_apps['submissions'][submission_id]['reviewed_by'] = modal_i.user.id
+                            all_apps['submissions'][submission_id]['review_message'] = message_text
+                            all_apps['submissions'][submission_id]['reviewed_at'] = datetime.now().isoformat()
+                            save_applications(all_apps)
+
+                        embed.color = discord.Color.red()
+                        embed.description = f'**От:** {interaction.user.mention}\n**ID:** {interaction.user.id}\n**Статус:** ❌ ОТКАЗАНО (с сообщением)'
+                        embed.add_field(name='❌ Рассмотрел', value=modal_i.user.mention, inline=False)
+                        embed.add_field(name='📝 Причина', value=message_text[:500], inline=False)
+                        await btn_i.message.edit(embed=embed, view=None)
+
+                        await modal_i.response.send_message(f'❌ Заявка отклонена с сообщением!', ephemeral=True)
+
+                        try:
+                            await interaction.user.send(
+                                f'❌ Ваша заявка **{app_name}** была **ОТКЛОНЕНА**.\n\n**Причина:**\n{message_text}')
+                        except:
+                            pass
+
+                await btn_i.response.send_modal(RejectMessageModal())
+
+        await send_channel.send(embed=embed, view=ReviewView())
         await interaction.response.send_message('✅ Заявка отправлена! Ожидай решения.', ephemeral=True)
 
 
@@ -1937,39 +2178,57 @@ async def setup_ticket(i: discord.Interaction, category: discord.CategoryChannel
     if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
     save(TICKET_SETTINGS_FILE, {str(i.guild_id): {'category': category.id, 'role': support_role.id}})
 
     class TicketView(discord.ui.View):
-        @discord.ui.button(label='🎫 Create Ticket', style=discord.ButtonStyle.primary)
+        @discord.ui.button(label=get_text(str(i.guild_id), 'ticket_create_button'), style=discord.ButtonStyle.primary)
         async def create(self, bi: discord.Interaction, button: discord.ui.Button):
+            await bi.response.send_message(get_text(str(bi.guild_id), 'ticket_creating'), ephemeral=True)
+
             s = load(TICKET_SETTINGS_FILE).get(str(bi.guild_id), {})
             cat = bi.guild.get_channel(s.get('category'))
             role = bi.guild.get_role(s.get('role'))
             name = f'ticket-{bi.user.name.lower()}-{random.randint(100, 999)}'
+
             ow = {
                 bi.guild.default_role: discord.PermissionOverwrite(view_channel=False),
-                bi.user: discord.PermissionOverwrite(view_channel=True, send_messages=True)
+                bi.user: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True)
             }
             if role:
-                ow[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+                ow[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True)
+
             ch = await bi.guild.create_text_channel(name, category=cat, overwrites=ow)
 
             class CloseView(discord.ui.View):
-                @discord.ui.button(label='🔒 Close', style=discord.ButtonStyle.danger)
+                @discord.ui.button(label=get_text(str(bi.guild_id), 'ticket_close_button'),
+                                   style=discord.ButtonStyle.danger)
                 async def close(self, ci: discord.Interaction, button: discord.ui.Button):
-                    await ci.response.send_message('Closing...', ephemeral=True)
+                    await ci.response.send_message(get_text(str(ci.guild_id), 'ticket_closing'), ephemeral=True)
+
+                    try:
+                        await bi.user.send(get_text(str(bi.guild_id), 'ticket_dm_closed', ch.name, ci.user.mention))
+                    except:
+                        pass
+
                     await asyncio.sleep(3)
                     await ch.delete()
 
-            e = discord.Embed(title='🎫 Ticket Created', description=f'{bi.user.mention} describe your issue',
-                              color=0x3498db)
+            e = discord.Embed(
+                title=get_text(str(bi.guild_id), 'ticket_embed_title'),
+                description=get_text(str(bi.guild_id), 'ticket_embed_desc', bi.user.mention),
+                color=0x3498db
+            )
             await ch.send(embed=e, view=CloseView())
-            await bi.response.send_message(get_text(str(bi.guild_id), 'ticket_created', channel=ch.mention),
-                                           ephemeral=True)
+            await bi.edit_original_response(content=get_text(str(bi.guild_id), 'ticket_created_channel', ch.mention))
 
-    e = discord.Embed(title='🎫 Ticket System', description='Click the button below to create a ticket', color=0x3498db)
+    e = discord.Embed(
+        title=get_text(str(i.guild_id), 'ticket_system_title'),
+        description=get_text(str(i.guild_id), 'ticket_system_desc'),
+        color=0x3498db
+    )
     await i.channel.send(embed=e, view=TicketView())
-    await i.response.send_message(get_text(str(i.guild_id), 'ticket_panel_created'), ephemeral=True)
+    await i.response.send_message(get_text(str(i.guild_id), 'ticket_system_setup'), ephemeral=True)
 
 
 @bot.tree.command(name='invite', description='Invite bot')
