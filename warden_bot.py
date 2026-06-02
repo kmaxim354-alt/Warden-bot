@@ -1165,4 +1165,4 @@ async def on_ready():
 
 # ========== RUN ==========
 TOKEN = ''
-bot.run(TOKEN)
+bot.run(os.environ['TOKEN'])
