@@ -39,6 +39,28 @@ def get_text(guild_id, key, *args):
         'ru': {
             'hello': 'Привет, {}! Я **Warden Bot** 🤖',
             'ping': '🏓 Понг! Задержка: {} мс',
+            'help_title': '📚 Помощь - {}',
+            'help_desc': 'Выбери категорию в меню ниже, чтобы увидеть список команд.\nИли используй `/help all` для полного списка.',
+            'help_cmd_count': '{} команд',
+            'help_footer': 'Всего 88 команд | Используй /help <категория>',
+            'help_all_title': '📖 Все команды',
+            'help_all_desc': 'Полный список всех команд бота:',
+            'help_category_title': '{} - Список команд',
+            'help_category_desc': 'Всего команд в категории: {}',
+            'help_select_placeholder': '📋 Выбери категорию...',
+            'help_select_overview': '📚 Обзор',
+            'help_select_overview_desc': 'Вернуться к началу',
+            'help_select_all': '📖 Все команды',
+            'help_select_all_desc': 'Показать все 88 команд',
+            'help_select_mod_desc': '28 команд',
+            'help_select_roles_desc': '8 команд',
+            'help_select_voice_desc': '5 команд',
+            'help_select_info_desc': '9 команд',
+            'help_select_level_desc': '6 команд',
+            'help_select_util_desc': '10 команд',
+            'help_select_fun_desc': '10 команд',
+            'help_select_setup_desc': '13 команд',
+            'help_select_misc_desc': '2 команды',
             'info_title': '🛡️ Warden Bot',
             'info_desc': 'Бот-хранитель для твоего сервера',
             'info_version': 'Версия',
@@ -275,6 +297,28 @@ def get_text(guild_id, key, *args):
             'report_staff_button': '📝 Report Staff',
             'report_staff_modal_title': '📝 Staff Report',
             'report_staff_against': 'Who are you reporting?',
+            'help_title': '📚 Help - {}',
+            'help_desc': 'Select a category from the menu below to see the command list.\nOr use `/help all` for full list.',
+            'help_cmd_count': '{} commands',
+            'help_footer': 'Total 88 commands | Use /help <category>',
+            'help_all_title': '📖 All Commands',
+            'help_all_desc': 'Full list of all bot commands:',
+            'help_category_title': '{} - Command List',
+            'help_category_desc': 'Total commands in category: {}',
+            'help_select_placeholder': '📋 Choose a category...',
+            'help_select_overview': '📚 Overview',
+            'help_select_overview_desc': 'Back to start',
+            'help_select_all': '📖 All Commands',
+            'help_select_all_desc': 'Show all 88 commands',
+            'help_select_mod_desc': '28 commands',
+            'help_select_roles_desc': '8 commands',
+            'help_select_voice_desc': '5 commands',
+            'help_select_info_desc': '9 commands',
+            'help_select_level_desc': '6 commands',
+            'help_select_util_desc': '10 commands',
+            'help_select_fun_desc': '10 commands',
+            'help_select_setup_desc': '13 commands',
+            'help_select_misc_desc': '2 commands',
             'report_staff_reason': 'Reason for report',
             'report_staff_proof': 'Evidence (screenshot links)',
             'report_staff_submitted': '✅ Your report has been submitted! Staff will review it shortly.',
@@ -621,178 +665,224 @@ async def info(i: discord.Interaction):
     await i.response.send_message(embed=e)
 
 
-HELP_CATEGORIES = [
-    {'id': 'overview', 'emoji': '📚', 'name_ru': 'Обзор', 'name_en': 'Overview', 'cmds': []},
-    {'id': 'all', 'emoji': '📖', 'name_ru': 'Все команды', 'name_en': 'All Commands', 'cmds': []},
+@bot.tree.command(name='help', description='Все команды бота с категориями')
+async def help_command(i: discord.Interaction, category: str = None):
+    if await check_tech_work(i): return
 
-    {'id': 'mod', 'emoji': '🛡️', 'name_ru': 'Модерация', 'name_en': 'Moderation',
-     'cmds': ['/mute', '/unmute', '/ban', '/unban', '/kick', '/clear', '/warn', '/warnings', '/topwarnings', '/unwarn',
-              '/slowmode', '/lock', '/unlock', '/report', '/pin', '/unpin', '/vkick', '/timeout', '/untimeout',
-              '/softban', '/massban', '/clean', '/strike', '/unstrike', '/strikes', '/topstrikes', '/setnick',
-              '/setupantinuke']},
-
-    {'id': 'roles', 'emoji': '👮', 'name_ru': 'Роли и каналы', 'name_en': 'Roles & Channels',
-     'cmds': ['/addrole', '/removerole', '/createrole', '/deleterole', '/createchannel', '/deletechannel',
-              '/clonechannel', '/movechannel']},
-
-    {'id': 'voice', 'emoji': '🎤', 'name_ru': 'Голос', 'name_en': 'Voice',
-     'cmds': ['/vmute', '/vunmute', '/vdeafen', '/vundeafen', '/vmove']},
-
-    {'id': 'info', 'emoji': '📋', 'name_ru': 'Инфо', 'name_en': 'Info',
-     'cmds': ['/hello', '/ping', '/info', '/serverinfo', '/userinfo', '/avatar', '/membercount', '/admins', '/bots']},
-
-    {'id': 'level', 'emoji': '⭐', 'name_ru': 'Продвижение', 'name_en': 'Leveling',
-     'cmds': ['/promotion', '/setuppromotion', '/leaderboard', '/addxp', '/setxp', '/setlevel']},
-
-    {'id': 'util', 'emoji': '🛠️', 'name_ru': 'Утилиты', 'name_en': 'Utility',
-     'cmds': ['/calc', '/poll', '/afk', '/unafk', '/remindme', '/timestamp', '/color', '/qr-code', '/uptime',
-              '/giveaway']},
-
-    {'id': 'fun', 'emoji': '🎉', 'name_ru': 'Развлечения', 'name_en': 'Fun',
-     'cmds': ['/cat', '/roll', '/8ball', '/joke', '/fact', '/advice', '/quote', '/trivia', '/rps', '/flip']},
-
-    {'id': 'setup', 'emoji': '⚙️', 'name_ru': 'Настройки', 'name_en': 'Settings',
-     'cmds': ['/setup-logs', '/setup-welcome', '/setup-photowelcome', '/disable-welcome', '/setup-captcha',
-              '/disable-captcha', '/setup-ticket', '/invite', '/tech_work', '/create-application',
-              '/list-applications', '/delete-application']},
-
-    {'id': 'misc', 'emoji': '🔗', 'name_ru': 'Прочее', 'name_en': 'Misc',
-     'cmds': ['/help', '/lang']},
-]
-
-
-def build_help_embed(i, category_id=None):
     lang = get_lang(str(i.guild_id))
-    embed = discord.Embed(color=discord.Color.blue())
 
-    embed.set_author(name='Wander Bot - Помощь', icon_url=bot.user.display_avatar.url)
-    embed.set_footer(text='А вы знали что всего 88 команд? :3')
+    # Категории с переводами
+    categories = {
+        'overview': {'emoji': '📚', 'name_ru': 'Обзор', 'name_en': 'Overview'},
+        'all': {'emoji': '📖', 'name_ru': 'Все команды', 'name_en': 'All Commands'},
+        'mod': {'emoji': '🛡️', 'name_ru': 'Модерация', 'name_en': 'Moderation'},
+        'roles': {'emoji': '👮', 'name_ru': 'Роли и каналы', 'name_en': 'Roles & Channels'},
+        'voice': {'emoji': '🎤', 'name_ru': 'Голос', 'name_en': 'Voice'},
+        'info': {'emoji': '📋', 'name_ru': 'Инфо', 'name_en': 'Info'},
+        'level': {'emoji': '⭐', 'name_ru': 'Продвижение', 'name_en': 'Leveling'},
+        'util': {'emoji': '🛠️', 'name_ru': 'Утилиты', 'name_en': 'Utility'},
+        'fun': {'emoji': '🎉', 'name_ru': 'Развлечения', 'name_en': 'Fun'},
+        'setup': {'emoji': '⚙️', 'name_ru': 'Настройки', 'name_en': 'Settings'},
+        'misc': {'emoji': '🔗', 'name_ru': 'Прочее', 'name_en': 'Misc'}
+    }
 
-    if category_id == 'overview' or category_id is None:
-        embed.description = 'Выбери категорию из списка ниже, чтобы посмотреть её команды.\n"📖 **Все команды**" покажет все команды сразу удобно!'
+    # Списки команд по категориям
+    commands_by_cat = {
+        'mod': ['/mute', '/unmute', '/ban', '/unban', '/kick', '/clear', '/warn', '/warnings', '/topwarnings',
+                '/delwarn', '/slowmode', '/lock', '/unlock', '/report', '/pin', '/unpin', '/vkick', '/timeout',
+                '/untimeout', '/softban', '/massban', '/clean', '/strike', '/unstrike', '/strikes', '/topstrikes',
+                '/setnick', '/setupantinuke'],
+        'roles': ['/addrole', '/removerole', '/createrole', '/deleterole', '/createchannel', '/deletechannel',
+                  '/clonechannel', '/movechannel'],
+        'voice': ['/vmute', '/vunmute', '/vdeafen', '/vundeafen', '/vmove'],
+        'info': ['/hello', '/ping', '/info', '/serverinfo', '/userinfo', '/avatar', '/membercount', '/admins', '/bots'],
+        'level': ['/promotion', '/setuppromotion', '/leaderboard', '/addxp', '/setxp', '/setlevel'],
+        'util': ['/calc', '/poll', '/afk', '/unafk', '/remindme', '/timestamp', '/color', '/qr-code', '/uptime',
+                 '/giveaway'],
+        'fun': ['/cat', '/roll', '/8ball', '/joke', '/fact', '/advice', '/quote', '/trivia', '/rps', '/flip'],
+        'setup': ['/setup-logs', '/setup-welcome', '/setup-photowelcome', '/disable-welcome', '/setup-captcha',
+                  '/disable-captcha', '/setup-ticket', '/setup-reportstaffticket', '/setup-partnershipticket',
+                  '/create-application', '/list-applications', '/delete-application', '/invite', '/tech_work'],
+        'misc': ['/help', '/lang']
+    }
 
-        for cat in HELP_CATEGORIES[2:]:
+    # Если указана конкретная категория
+    if category and category in categories:
+        cat = categories[category]
+        name = cat['name_ru'] if lang == 'ru' else cat['name_en']
+        cmds = commands_by_cat.get(category, [])
+
+        embed = discord.Embed(
+            title=f'{cat["emoji"]} **{name}**',
+            description=get_text(str(i.guild_id), 'help_category_desc', len(cmds)),
+            color=discord.Color.blue()
+        )
+
+        # Разбиваем команды на строки по 10 штук
+        for j in range(0, len(cmds), 10):
+            embed.add_field(
+                name='‎',
+                value=' '.join(cmds[j:j + 10]),
+                inline=False
+            )
+
+        await i.response.send_message(embed=embed, ephemeral=True)
+        return
+
+    # Если "все команды"
+    if category == 'all':
+        embed = discord.Embed(
+            title=get_text(str(i.guild_id), 'help_all_title'),
+            description=get_text(str(i.guild_id), 'help_all_desc'),
+            color=discord.Color.blue()
+        )
+
+        for cat_id, cat in categories.items():
+            if cat_id in ['overview', 'all']:
+                continue
             name = cat['name_ru'] if lang == 'ru' else cat['name_en']
-            embed.add_field(name=f'{cat["emoji"]} **{name}**',
-                            value=f'`{len(cat["cmds"])}` команд',
-                            inline=True)
+            cmds = commands_by_cat.get(cat_id, [])
+            embed.add_field(
+                name=f'{cat["emoji"]} {name} ({len(cmds)})',
+                value=' '.join(cmds[:8]) + ('...' if len(cmds) > 8 else ''),
+                inline=False
+            )
 
-    elif category_id == 'all':
-        embed.title = '📖 **Все команды**'
-        embed.description = 'Полный список всех слэш-команд, разбит по категориям.'
+        await i.response.send_message(embed=embed, ephemeral=True)
+        return
 
-        embed.add_field(name='🛡️ **Модерация**',
-                        value='`/mute` `/unmute` `/ban` `/unban` `/kick` `/clear` `/warn` `/warnings` `/topwarnings` `/unwarn` `/slowmode` `/lock` `/unlock` `/report` `/pin` `/unpin` `/vkick` `/timeout` `/untimeout` `/softban` `/massban` `/clean` `/strike` `/unstrike` `/strikes` `/topstrikes` `/setnick` `/setupantinuke`',
-                        inline=False)
+    # Главное меню (обзор)
+    embed = discord.Embed(
+        title=get_text(str(i.guild_id), 'help_title', 'Warden Bot'),
+        description=get_text(str(i.guild_id), 'help_desc'),
+        color=discord.Color.blue()
+    )
 
-        embed.add_field(name='👮 **Роли и каналы**',
-                        value='`/addrole` `/removerole` `/createrole` `/deleterole` `/createchannel` `/deletechannel` `/clonechannel` `/movechannel`',
-                        inline=False)
+    for cat_id, cat in categories.items():
+        if cat_id in ['overview', 'all']:
+            continue
+        name = cat['name_ru'] if lang == 'ru' else cat['name_en']
+        cmd_count = len(commands_by_cat.get(cat_id, []))
+        embed.add_field(
+            name=f'{cat["emoji"]} **{name}**',
+            value=get_text(str(i.guild_id), 'help_cmd_count', cmd_count),
+            inline=True
+        )
 
-        embed.add_field(name='🎤 **Голос**',
-                        value='`/vmute` `/vunmute` `/vdeafen` `/vundeafen` `/vmove`',
-                        inline=False)
+    embed.set_footer(text=get_text(str(i.guild_id), 'help_footer'))
 
-        embed.add_field(name='📋 **Инфо**',
-                        value='`/hello` `/ping` `/info` `/serverinfo` `/userinfo` `/avatar` `/membercount` `/admins` `/bots`',
-                        inline=False)
-
-        embed.add_field(name='⭐ **Продвижение**',
-                        value='`/promotion` `/setuppromotion` `/leaderboard` `/addxp` `/setxp` `/setlevel`',
-                        inline=False)
-
-        embed.add_field(name='🛠️ **Утилиты**',
-                        value='`/calc` `/poll` `/afk` `/unafk` `/remindme` `/timestamp` `/color` `/qr-code` `/uptime` `/giveaway`',
-                        inline=False)
-
-        embed.add_field(name='🎉 **Развлечения**',
-                        value='`/cat` `/roll` `/8ball` `/joke` `/fact` `/advice` `/quote` `/trivia` `/rps` `/flip`',
-                        inline=False)
-
-        embed.add_field(name='⚙️ **Настройки**',
-                        value='`/setup-logs` `/setup-welcome` `/setup-photowelcome` `/disable-welcome` `/setup-captcha` `/disable-captcha` `/setup-ticket` `/invite` `/tech_work` `/create-application` `/list-applications` `/delete-application`',
-                        inline=False)
-
-        embed.add_field(name='🔗 **Прочее**',
-                        value='`/help` `/lang`',
-                        inline=False)
-
-    elif category_id:
-        for cat in HELP_CATEGORIES:
-            if cat['id'] == category_id:
-                name = cat['name_ru'] if lang == 'ru' else cat['name_en']
-                embed.title = f'{cat["emoji"]} **{name}**'
-                embed.description = f'Список всех команд в категории:'
-
-                cmds = cat['cmds']
-                if len(cmds) > 12:
-                    chunk_size = (len(cmds) + 2) // 3
-                    chunks = [cmds[i:i + chunk_size] for i in range(0, len(cmds), chunk_size)]
-                    for i, chunk in enumerate(chunks):
-                        embed.add_field(
-                            name=f'📌 **Часть {i + 1}**' if len(chunks) > 1 else f'📌 **{name}** ({len(cmds)})',
-                            value=' '.join(chunk), inline=False)
-                else:
-                    embed.add_field(name=f'📌 **{name}** ({len(cmds)})', value=' '.join(cmds), inline=False)
-                break
-
-    return embed
-
-
-def build_help_components(i):
-    lang = get_lang(str(i.guild_id))
-    view = discord.ui.View(timeout=120)
-
+    # Создаём меню выбора
     class HelpSelect(discord.ui.Select):
         def __init__(self):
             options = []
-            for cat in HELP_CATEGORIES:
+            for cat_id, cat in categories.items():
                 name = cat['name_ru'] if lang == 'ru' else cat['name_en']
-                if cat['id'] == 'overview':
-                    description = 'Вернуться к началу' if lang == 'ru' else 'Back to start'
-                elif cat['id'] == 'all':
-                    description = 'Все 88 команд' if lang == 'ru' else 'All 88 commands'
+                if cat_id == 'overview':
+                    desc = get_text(str(i.guild_id), 'help_select_overview_desc')
+                elif cat_id == 'all':
+                    desc = get_text(str(i.guild_id), 'help_select_all_desc')
+                elif cat_id == 'mod':
+                    desc = get_text(str(i.guild_id), 'help_select_mod_desc')
+                elif cat_id == 'roles':
+                    desc = get_text(str(i.guild_id), 'help_select_roles_desc')
+                elif cat_id == 'voice':
+                    desc = get_text(str(i.guild_id), 'help_select_voice_desc')
+                elif cat_id == 'info':
+                    desc = get_text(str(i.guild_id), 'help_select_info_desc')
+                elif cat_id == 'level':
+                    desc = get_text(str(i.guild_id), 'help_select_level_desc')
+                elif cat_id == 'util':
+                    desc = get_text(str(i.guild_id), 'help_select_util_desc')
+                elif cat_id == 'fun':
+                    desc = get_text(str(i.guild_id), 'help_select_fun_desc')
+                elif cat_id == 'setup':
+                    desc = get_text(str(i.guild_id), 'help_select_setup_desc')
+                elif cat_id == 'misc':
+                    desc = get_text(str(i.guild_id), 'help_select_misc_desc')
                 else:
-                    description = f'{len(cat["cmds"])} команд' if lang == 'ru' else f'{len(cat["cmds"])} commands'
-                options.append(
-                    discord.SelectOption(label=name, emoji=cat['emoji'], value=cat['id'], description=description))
-            super().__init__(placeholder='📋 Выбери категорию...' if lang == 'ru' else '📋 Choose a category...',
-                             options=options, min_values=1, max_values=1)
+                    desc = ''
+
+                options.append(discord.SelectOption(
+                    label=name,
+                    emoji=cat['emoji'],
+                    value=cat_id,
+                    description=desc
+                ))
+
+            super().__init__(
+                placeholder=get_text(str(i.guild_id), 'help_select_placeholder'),
+                options=options,
+                min_values=1,
+                max_values=1
+            )
 
         async def callback(self, select_interaction: discord.Interaction):
-            category_id = self.values[0]
-            embed = build_help_embed(select_interaction, category_id)
+            selected = self.values[0]
 
-            for cat in HELP_CATEGORIES:
-                if cat['id'] == category_id:
-                    self.placeholder = f'{cat["emoji"]} {cat["name_ru"] if lang == "ru" else cat["name_en"]}'
-                    break
+            if selected == 'overview':
+                # Показать главное меню
+                embed = discord.Embed(
+                    title=get_text(str(select_interaction.guild_id), 'help_title', 'Warden Bot'),
+                    description=get_text(str(select_interaction.guild_id), 'help_desc'),
+                    color=discord.Color.blue()
+                )
+                for cat_id, cat in categories.items():
+                    if cat_id in ['overview', 'all']:
+                        continue
+                    name = cat['name_ru'] if lang == 'ru' else cat['name_en']
+                    cmd_count = len(commands_by_cat.get(cat_id, []))
+                    embed.add_field(
+                        name=f'{cat["emoji"]} **{name}**',
+                        value=get_text(str(select_interaction.guild_id), 'help_cmd_count', cmd_count),
+                        inline=True
+                    )
+                embed.set_footer(text=get_text(str(select_interaction.guild_id), 'help_footer'))
+                await select_interaction.response.edit_message(embed=embed, view=self.view)
 
-            await select_interaction.response.edit_message(embed=embed, view=view)
+            elif selected == 'all':
+                # Показать все команды
+                embed = discord.Embed(
+                    title=get_text(str(select_interaction.guild_id), 'help_all_title'),
+                    description=get_text(str(select_interaction.guild_id), 'help_all_desc'),
+                    color=discord.Color.blue()
+                )
+                for cat_id, cat in categories.items():
+                    if cat_id in ['overview', 'all']:
+                        continue
+                    name = cat['name_ru'] if lang == 'ru' else cat['name_en']
+                    cmds = commands_by_cat.get(cat_id, [])
+                    embed.add_field(
+                        name=f'{cat["emoji"]} {name} ({len(cmds)})',
+                        value=' '.join(cmds[:8]) + ('...' if len(cmds) > 8 else ''),
+                        inline=False
+                    )
+                await select_interaction.response.edit_message(embed=embed, view=self.view)
 
+            else:
+                # Показать команды категории
+                cat = categories[selected]
+                name = cat['name_ru'] if lang == 'ru' else cat['name_en']
+                cmds = commands_by_cat.get(selected, [])
+
+                embed = discord.Embed(
+                    title=f'{cat["emoji"]} **{name}**',
+                    description=get_text(str(select_interaction.guild_id), 'help_category_desc', len(cmds)),
+                    color=discord.Color.blue()
+                )
+
+                for j in range(0, len(cmds), 10):
+                    embed.add_field(
+                        name='‎',
+                        value=' '.join(cmds[j:j + 10]),
+                        inline=False
+                    )
+
+                await select_interaction.response.edit_message(embed=embed, view=self.view)
+
+    view = discord.ui.View(timeout=120)
     view.add_item(HelpSelect())
 
-    invite_btn = discord.ui.Button(label='Пригласить', style=discord.ButtonStyle.url,
-                                   url='https://discord.com/oauth2/authorize?client_id=1510998282254549012&permissions=8&integration_type=0&scope=bot+applications.commands')
-    server_btn = discord.ui.Button(label='Сервер сообщества', style=discord.ButtonStyle.url,
-                                   url='https://discord.gg/njVYNFs6Zk')
-
-    view.add_item(invite_btn)
-    view.add_item(server_btn)
-
-    return view
-
-
-try:
-    bot.tree.remove_command('help')
-except:
-    pass
-
-
-@bot.tree.command(name='help', description='Все команды бота с категориями')
-async def help_command(i: discord.Interaction):
-    if await check_tech_work(i): return
-    await i.response.send_message(embed=build_help_embed(i), view=build_help_components(i))
+    await i.response.send_message(embed=embed, view=view, ephemeral=True)
 
 
 from datetime import datetime, timedelta, timezone
@@ -2206,6 +2296,7 @@ async def setup_ticket(i: discord.Interaction, category: discord.CategoryChannel
                 async def close(self, ci: discord.Interaction, button: discord.ui.Button):
                     await ci.response.send_message(get_text(str(ci.guild_id), 'ticket_closing'), ephemeral=True)
 
+                    # Уведомляем пользователя в ЛС
                     try:
                         await bi.user.send(get_text(str(bi.guild_id), 'ticket_dm_closed', ch.name, ci.user.mention))
                     except:
