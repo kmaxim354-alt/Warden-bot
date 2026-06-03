@@ -520,9 +520,13 @@ def get_text(guild_id, key, *args):
         },
     }
     text = texts[lang].get(key, f'[{key}]')
-    if args:
-        return text.format(*args)
-    return text
+    def get_text(guild_id, key, *args, **kwargs):
+        lang = get_lang(guild_id)
+        text = texts[lang].get(key, f'[{key}]')
+        try:
+           return text.format(*args, **kwargs)
+        except (IndexError, KeyError):
+              return text
 
 
 tech_work_active = False
