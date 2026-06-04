@@ -3371,6 +3371,37 @@ async def setup_partnershipticket(i: discord.Interaction, category: discord.Cate
     await i.response.send_message('✅ Система партнёрства настроена!', ephemeral=True)
 
 
+@bot.tree.command(name='send', description='Отправить ЛС пользователю по ID (только для разработчика)')
+async def send_dm(i: discord.Interaction, user_id: str, message: str):
+    # Проверка - только вы можете использовать
+    if i.user.id != 1436760469980450816:
+        return await i.response.send_message('❌ Эта команда только для разработчика!', ephemeral=True)
+
+    if await check_tech_work(i): return
+
+    try:
+        user_id_int = int(user_id)
+        user = await bot.fetch_user(user_id_int)
+
+        await user.send(message)
+        embed = discord.Embed(
+            title='📨 Сообщение отправлено',
+            description=f'✅ Сообщение успешно отправлено пользователю {user.name} (ID: {user_id})',
+            color=discord.Color.green()
+        )
+        embed.add_field(name='📝 Текст сообщения', value=message[:500], inline=False)
+        await i.response.send_message(embed=embed, ephemeral=True)
+    except ValueError:
+        await i.response.send_message(f'❌ Неверный формат ID!', ephemeral=True)
+    except discord.NotFound:
+        await i.response.send_message(f'❌ Пользователь с ID `{user_id}` не найден!', ephemeral=True)
+    except discord.Forbidden:
+        await i.response.send_message(f'❌ Не могу отправить сообщение пользователю с ID `{user_id}` (закрыты ЛС)',
+                                      ephemeral=True)
+    except Exception as e:
+        await i.response.send_message(f'❌ Ошибка: {e}', ephemeral=True)
+
+
 VIP_USER_ID = 1436760469980450816
 VIP_NICKNAME = "Ceo.wander Forever.morgan"
 
@@ -3443,7 +3474,7 @@ async def on_member_join(member):
             msg = ws.get('welcome_message', 'Welcome {member}!').replace('{member}', member.mention)
             await ch.send(msg + ' 👑')
 
-        return 
+        return
 
 
 @bot.event
