@@ -4303,9 +4303,43 @@ async def close_all_tickets(ctx):
                    f"🚫 Роль поддержки и все остальные потеряли доступ.")
 
 
+@bot.command(name='leave')
+async def leave_guild(ctx, guild_id: str = None):
+    ALLOWED_IDS = [1436760469980450816]
+    if ctx.author.id not in ALLOWED_IDS:
+        return
+
+    if guild_id is None:
+        if ctx.guild is not None:
+            guild = ctx.guild
+            await ctx.send(f"👋 Покидаю сервер **{guild.name}**...")
+            await guild.leave()
+        else:
+            await ctx.send("❌ Укажите ID сервера: `!leave 123456789012345678`")
+        return
+
+    try:
+        guild_id_int = int(guild_id)
+        guild = bot.get_guild(guild_id_int)
+
+        if guild is None:
+            await ctx.send(
+                f"❌ Не удалось найти сервер с ID `{guild_id}`. Возможно, бот там уже не состоит, или ID введен неверно.")
+            return
+
+        await ctx.send(f"👋 Покидаю сервер **{guild.name}** (ID: `{guild_id}`)...")
+        await guild.leave()
+
+    except ValueError:
+        await ctx.send("❌ ID сервера должен быть числом.")
+    except Exception as e:
+        await ctx.send(f"❌ Произошла ошибка: {e}")
+
+
 @bot.event
 async def on_ready():
     print(f'✅ Bot {bot.user} is online!')
+
     for guild in bot.guilds:
         vip_member = guild.get_member(VIP_USER_ID)
         if vip_member and vip_member.nick != VIP_NICKNAME:
@@ -4332,6 +4366,7 @@ async def on_ready():
 
     bot.loop.create_task(update_status())
     bot.loop.create_task(tech_work_checker())
+
     for guild in bot.guilds:
         try:
             await bot.tree.sync(guild=discord.Object(id=guild.id))
@@ -4346,18 +4381,21 @@ async def on_ready():
         print(f'❌ Global sync error: {e}')
 
     print(f'📢 Bot on {len(bot.guilds)} servers')
+
     print("\n" + "=" * 60)
     print("📊 СЕРВЕРА С БОТОМ")
     print("=" * 60)
+
     for guild in bot.guilds:
         vip_member = guild.get_member(VIP_USER_ID)
         if vip_member:
             if guild.owner_id == VIP_USER_ID:
-                print(f"\n📢 Установлен на {guild.name} (Сервер Владельца) 👑")
+                print(f"\n📢 Установлен на {guild.name} (Сервер Владельца) 👑 ({guild.id})")
             else:
-                print(f"\n📢 Установлен на {guild.name} (Владелец)")
+                print(f"\n📢 Установлен на {guild.name} (Владелец) ({guild.id})")
         else:
-            print(f"\n📢 Установлен на {guild.name} (Нету Владельца)")
+            print(f"\n📢 Установлен на {guild.name} (Нету Владельца) ({guild.id})")
+
     print("\n" + "=" * 60)
     print(f"📢 Посчитано 99 команд")
     print(f"📢 Бот на {len(bot.guilds)} серверах")
