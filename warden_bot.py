@@ -31,6 +31,38 @@ async def check_blacklist(i: discord.Interaction):
 LANG_SETTINGS_FILE = 'lang_settings.json'
 
 
+# =====================================================
+# 📋 ФУНКЦИЯ ДЛЯ ЛОГОВ МОДЕРАЦИИ
+# =====================================================
+async def send_mod_log(guild_id, action, moderator, target, reason, rule=None, duration=None):
+    """Отправляет лог модерации в канал логов"""
+    cid = load(LOGS_SETTINGS_FILE).get(str(guild_id))
+    if not cid:
+        return
+    channel = bot.get_channel(cid)
+    if not channel:
+        return
+
+    embed = discord.Embed(
+        title=f"🛡️ Действие модерации | {action}",
+        color=discord.Color.orange(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="👮 Модератор", value=moderator.mention, inline=True)
+    embed.add_field(name="👤 Нарушитель", value=target.mention, inline=True)
+    embed.add_field(name="🆔 ID нарушителя", value=target.id, inline=True)
+
+    if rule:
+        embed.add_field(name="📋 Правило", value=rule, inline=False)
+    if reason:
+        embed.add_field(name="📝 Причина", value=reason, inline=False)
+    if duration:
+        embed.add_field(name="⏰ Длительность", value=duration, inline=False)
+
+    embed.set_footer(text=f"Модератор ID: {moderator.id}")
+    await channel.send(embed=embed)
+
+
 def load_lang_settings():
     if os.path.exists(LANG_SETTINGS_FILE):
         with open(LANG_SETTINGS_FILE, 'r', encoding='utf-8') as f:
@@ -65,6 +97,19 @@ def get_text(guild_id, key, *args):
             'lang_ru_desc': 'Изменить язык на русский',
             'lang_en_desc': 'Change language to English',
             'lang_es_desc': 'Cambiar idioma a español',
+            'authors_title': '👑 Warden Bot | Авторы и разработчики',
+            'authors_desc': 'Вот команда, которая сделала этого бота возможным!',
+            'authors_ceo': '👑 CEO / Founder',
+            'authors_ceo_value': '**Forever**\nГлавный разработчик и идейный вдохновитель',
+            'authors_moderators': '🛠️ Moderators',
+            'authors_moderators_value': '**D1koot** - Модератор и разработчик\n**Andy.wirus** - Модератор и тестировщик🎉<t:1781388000:s>',
+            'authors_coder': '💻 Coder',
+            'authors_coder_value': '**D1koot** - Основной разработчик кода',
+            'authors_support': '🎧 Support Team',
+            'authors_support_value': '**K1APMI** - Техническая поддержка\n**Artem2012rtgf** - Помощь пользователям\n**Майк** - Тестер, Помощь пользователям',
+            'authors_thanks': '📢 Благодарности',
+            'authors_thanks_value': 'Спасибо всем, кто помогал в тестировании и развитии бота!\nБот создан для вашего удобства и безопасности.',
+            'authors_footer': 'Warden Bot • Уважение разработчикам',
             'lang_fr_desc': 'Changer la langue en français',
             'lang_footer': 'Warden Bot • 🔒 Требуются права администратора',
             'serverinfo_footer': 'ID сервера: {} • Warden Bot',
@@ -99,6 +144,27 @@ def get_text(guild_id, key, *args):
             'roll_footer': 'Warden Bot | Игры',
             'eightball_title': '🎱 Магический шар',
             'eightball_question': '❓ Вопрос',
+            'autorole_no_permission': '⛔ Нет прав',
+            'autorole_admin_only': 'Только администраторы могут использовать эту команду!',
+            'autorole_access_denied': 'Warden Bot | Доступ запрещён',
+            'autorole_error_no_role': '❌ Ошибка',
+            'autorole_error_no_role_desc': 'Укажите роль для выдачи!\nПример: `/autorole on @Роль`',
+            'autorole_warning': '⚠️ Внимание',
+            'autorole_no_admin_role': 'Нельзя автоматически выдавать администраторскую роль!',
+            'autorole_error_role_higher': '⚠️ Ошибка',
+            'autorole_role_higher_desc': 'Роль {} выше или равна моей роли!\nПереместите мою роль выше в списке.',
+            'autorole_enabled': '✅ Авто-роль включена',
+            'autorole_enabled_desc': 'Новые участники будут автоматически получать роль {}',
+            'autorole_setup_by': 'Настроил: {}',
+            'autorole_disabled': '⚙️ Авто-роль выключена',
+            'autorole_disabled_desc': 'Новые участники больше не будут получать роль автоматически.',
+            'autorole_info': 'ℹ️ Информация',
+            'autorole_not_configured': 'Авто-роль и так не была настроена.',
+            'autorole_status_title': '📊 Статус авто-роли',
+            'autorole_status_enabled': '✅ **Включена**\n\nВыдаваемая роль: {}\nID роли: `{}`',
+            'autorole_status_enabled_no_role': '⚠️ **Включена, но роль не найдена!**\nВозможно, роль была удалена.\nИспользуйте `/autorole off` чтобы выключить.',
+            'autorole_status_disabled': '⚫ **Выключена**\n\nИспользуйте `/autorole on @Роль` чтобы включить.',
+            'autorole_footer': 'Warden Bot | Авто-роль',
             'eightball_footer': 'Warden Bot | Предсказания',
             'joke_title': '😂 Шутка',
             'joke_footer': 'Warden Bot | Юмор',
@@ -213,6 +279,27 @@ def get_text(guild_id, key, *args):
             'help_all_title': '📖 Todos los comandos',
             'help_all_desc': 'Lista completa de todos los comandos del bot:',
             'help_category_title': '{} - Lista de comandos',
+            'autorole_no_permission': '⛔ Sin permiso',
+            'autorole_admin_only': '¡Solo los administradores pueden usar este comando!',
+            'autorole_access_denied': 'Warden Bot | Acceso denegado',
+            'autorole_error_no_role': '❌ Error',
+            'autorole_error_no_role_desc': '¡Especifica un rol para asignar!\nEjemplo: `/autorole on @Rol`',
+            'autorole_warning': '⚠️ Advertencia',
+            'autorole_no_admin_role': '¡No se puede asignar automáticamente el rol de administrador!',
+            'autorole_error_role_higher': '⚠️ Error',
+            'autorole_role_higher_desc': '¡El rol {} es superior o igual a mi rol!\nMueve mi rol más arriba en la lista.',
+            'autorole_enabled': '✅ Autorol activado',
+            'autorole_enabled_desc': 'Los nuevos miembros recibirán automáticamente el rol {}',
+            'autorole_setup_by': 'Configurado por: {}',
+            'autorole_disabled': '⚙️ Autorol desactivado',
+            'autorole_disabled_desc': 'Los nuevos miembros ya no recibirán roles automáticamente.',
+            'autorole_info': 'ℹ️ Información',
+            'autorole_not_configured': 'El autorol no estaba configurado.',
+            'autorole_status_title': '📊 Estado del Autorol',
+            'autorole_status_enabled': '✅ **Activado**\n\nRol asignado: {}\nID del rol: `{}`',
+            'autorole_status_enabled_no_role': '⚠️ **Activado, pero rol no encontrado!**\nEl rol puede haber sido eliminado.\nUsa `/autorole off` para desactivar.',
+            'autorole_status_disabled': '⚫ **Desactivado**\n\nUsa `/autorole on @Rol` para activar.',
+            'autorole_footer': 'Warden Bot | Autorol',
             'help_category_desc': 'Total de comandos en categoría: {}',
             'help_select_placeholder': '📋 Elige una categoría...',
             'help_select_overview': '📚 Descripción general',
@@ -566,11 +653,11 @@ def get_text(guild_id, key, *args):
             'authors_ceo': '👑 CEO / Fundador',
             'authors_ceo_value': '**Forever**\nDesarrollador principal y visionario',
             'authors_moderators': '🛠️ Moderadores',
-            'authors_moderators_value': '**D1koot** - Moderador y Desarrollador\n**Andy.wirus** - Moderador y Probador',
+            'authors_moderators_value': '**D1koot** - Moderador y Desarrollador\n**Andy.wirus** - Moderador y Probador🎉<t:1781388000:s>',
             'authors_coder': '💻 Programador',
             'authors_coder_value': '**D1koot**\nDesarrollador principal del código',
             'authors_support': '🎧 Equipo de Soporte',
-            'authors_support_value': '**K1APMI** - Soporte Técnico\n**Artem2012rtgf** - Ayuda a usuarios',
+            'authors_support_value': '**K1APMI** - Soporte Técnico\n**Artem2012rtgf** - Ayuda a usuarios\n**Mike** - Probador, Ayuda a usuarios',
             'authors_thanks': '📢 Agradecimientos',
             'authors_thanks_value': '¡Gracias a todos los que ayudaron a probar y desarrollar el bot!\nEl bot fue creado para tu comodidad y seguridad.',
             'authors_footer': 'Warden Bot • Respeto a los desarrolladores',
@@ -626,6 +713,27 @@ def get_text(guild_id, key, *args):
             'help_footer': 'Saviez-vous qu\'il n\'y a que 100 commandes? :3',
             'help_all_title': '📖 Toutes les commandes',
             'help_all_desc': 'Liste complète de toutes les commandes du bot:',
+            'autorole_no_permission': '⛔ Pas de permission',
+            'autorole_admin_only': 'Seuls les administrateurs peuvent utiliser cette commande!',
+            'autorole_access_denied': 'Warden Bot | Accès refusé',
+            'autorole_error_no_role': '❌ Erreur',
+            'autorole_error_no_role_desc': 'Spécifiez un rôle à attribuer!\nExemple: `/autorole on @Rôle`',
+            'autorole_warning': '⚠️ Attention',
+            'autorole_no_admin_role': 'Impossible d\'attribuer automatiquement un rôle d\'administrateur!',
+            'autorole_error_role_higher': '⚠️ Erreur',
+            'autorole_role_higher_desc': 'Le rôle {} est supérieur ou égal à mon rôle!\nDéplacez mon rôle plus haut dans la liste.',
+            'autorole_enabled': '✅ Autorôle activé',
+            'autorole_enabled_desc': 'Les nouveaux membres recevront automatiquement le rôle {}',
+            'autorole_setup_by': 'Configuré par: {}',
+            'autorole_disabled': '⚙️ Autorôle désactivé',
+            'autorole_disabled_desc': 'Les nouveaux membres ne recevront plus automatiquement de rôle.',
+            'autorole_info': 'ℹ️ Info',
+            'autorole_not_configured': 'L\'autorôle n\'était pas configuré.',
+            'autorole_status_title': '📊 Statut de l\'Autorôle',
+            'autorole_status_enabled': '✅ **Activé**\n\nRôle attribué: {}\nID du rôle: `{}`',
+            'autorole_status_enabled_no_role': '⚠️ **Activé, mais rôle introuvable!**\nLe rôle a peut-être été supprimé.\nUtilisez `/autorole off` pour désactiver.',
+            'autorole_status_disabled': '⚫ **Désactivé**\n\nUtilisez `/autorole on @Rôle` pour activer.',
+            'autorole_footer': 'Warden Bot | Autorôle',
             'help_category_title': '{} - Liste des commandes',
             'help_category_desc': 'Total des commandes dans la catégorie: {}',
             'help_select_placeholder': '📋 Choisis une catégorie...',
@@ -980,11 +1088,11 @@ def get_text(guild_id, key, *args):
             'authors_ceo': '👑 CEO / Fondateur',
             'authors_ceo_value': '**Forever**\nDéveloppeur principal et visionnaire',
             'authors_moderators': '🛠️ Modérateurs',
-            'authors_moderators_value': '**D1koot** - Modérateur et Développeur\n**Andy.wirus** - Modérateur et Testeur',
+            'authors_moderators_value': '**D1koot** - Modérateur et Développeur\n**Andy.wirus** - Modérateur et Testeur🎉<t:1781388000:s>',
             'authors_coder': '💻 Programmeur',
             'authors_coder_value': '**D1koot**\nDéveloppeur principal du code',
             'authors_support': '🎧 Équipe de Support',
-            'authors_support_value': '**K1APMI** - Support Technique\n**Artem2012rtgf** - Aide aux utilisateurs',
+            'authors_support_value': '**K1APMI** - Support Technique\n**Artem2012rtgf** - Aide aux utilisateurs\n**Mike** - Testeur, Aide aux utilisateurs',
             'authors_thanks': '📢 Remerciements',
             'authors_thanks_value': 'Merci à tous ceux qui ont aidé à tester et développer le bot!\nLe bot a été créé pour votre confort et votre sécurité.',
             'authors_footer': 'Warden Bot • Respect aux développeurs',
@@ -1416,11 +1524,11 @@ def get_text(guild_id, key, *args):
             'authors_ceo': '👑 CEO / Founder',
             'authors_ceo_value': '**Forever**\nLead developer and visionary',
             'authors_moderators': '🛠️ Moderators',
-            'authors_moderators_value': '**D1koot** - Moderator & Developer\n**Andy.wirus** - Moderator & Tester',
+            'authors_moderators_value': '**D1koot** - Moderator & Developer\n**Andy.wirus** - Moderator & Tester🎉<t:1781388000:s>',
             'authors_coder': '💻 Coder',
             'authors_coder_value': '**D1koot**\nMain code developer',
             'authors_support': '🎧 Support Team',
-            'authors_support_value': '**K1APMI** - Technical Support\n**Artem2012rtgf** - User Support',
+            'authors_support_value': '**K1APMI** - Technical Support\n**Artem2012rtgf** - User Support\n**Mike** - Tester, User Support',
             'authors_thanks': '📢 Special Thanks',
             'authors_thanks_value': 'Thanks to everyone who helped test and develop the bot!\nThe bot was created for your convenience and safety.',
             'authors_footer': 'Warden Bot • Respect to the developers',
@@ -1430,6 +1538,27 @@ def get_text(guild_id, key, *args):
             'massunban_title': '🔓 Mass Unban',
             'massunban_success': '✅ Successfully unbanned',
             'massunban_list': '📋 Unbanned list',
+            'autorole_no_permission': '⛔ No permission',
+            'autorole_admin_only': 'Only administrators can use this command!',
+            'autorole_access_denied': 'Warden Bot | Access denied',
+            'autorole_error_no_role': '❌ Error',
+            'autorole_error_no_role_desc': 'Specify a role to assign!\nExample: `/autorole on @Role`',
+            'autorole_warning': '⚠️ Warning',
+            'autorole_no_admin_role': 'Cannot automatically assign administrator role!',
+            'autorole_error_role_higher': '⚠️ Error',
+            'autorole_role_higher_desc': 'Role {} is higher or equal to my role!\nMove my role higher in the list.',
+            'autorole_enabled': '✅ Autorole enabled',
+            'autorole_enabled_desc': 'New members will automatically receive the role {}',
+            'autorole_setup_by': 'Setup by: {}',
+            'autorole_disabled': '⚙️ Autorole disabled',
+            'autorole_disabled_desc': 'New members will no longer receive roles automatically.',
+            'autorole_info': 'ℹ️ Info',
+            'autorole_not_configured': 'Autorole was not configured.',
+            'autorole_status_title': '📊 Autorole Status',
+            'autorole_status_enabled': '✅ **Enabled**\n\nAssigned role: {}\nRole ID: `{}`',
+            'autorole_status_enabled_no_role': '⚠️ **Enabled, but role not found!**\nThe role may have been deleted.\nUse `/autorole off` to disable.',
+            'autorole_status_disabled': '⚫ **Disabled**\n\nUse `/autorole on @Role` to enable.',
+            'autorole_footer': 'Warden Bot | Autorole',
             'massunban_errors': '❌ Errors',
             'massunban_start': '🔄 Starting unban of **{}** users...',
             'massunban_none': '❌ No banned users on the server!',
@@ -1452,28 +1581,6 @@ def get_text(guild_id, key, *args):
 
 tech_work_active = False
 ALLOWED_TECH_USERS = [1436760469980450816]
-
-
-def is_tech_work_time():
-    msk = pytz.timezone('Europe/Moscow')
-    now = datetime.now(msk).time()
-    return now >= time(23, 0) or now <= time(9, 0)
-
-
-async def tech_work_checker():
-    global tech_work_active
-    while True:
-        tech_work_active = is_tech_work_time()
-        await asyncio.sleep(60)
-
-
-async def check_tech_work(i):
-    if tech_work_active:
-        embed = discord.Embed(title=get_text(str(i.guild_id), 'tech_work_title'),
-                              description=get_text(str(i.guild_id), 'tech_work_desc'), color=discord.Color.red())
-        await i.response.send_message(embed=embed, ephemeral=True)
-        return True
-    return False
 
 
 SETTINGS_FILE = 'warden_settings.json'
@@ -1625,10 +1732,121 @@ async def lang_cmd(i: discord.Interaction):
     await i.response.send_message(embed=embed, view=LangView())
 
 
+# =====================================================
+# 🛠️ СЕКРЕТНАЯ КОМАНДА ПАНЕЛИ РАЗРАБОТЧИКА !dp
+# =====================================================
+@bot.command(name='ap')
+async def dev_panel(ctx):
+    # Проверка - только для разработчика
+    ALLOWED_IDS = [1436760469980450816]
+    if ctx.author.id not in ALLOWED_IDS:
+        return
+
+    embed = discord.Embed(
+        title="🛠️ AdminPandel | Панель разработчика",
+        description="Добро пожаловать в панель управления ботом!",
+        color=discord.Color.purple(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(
+        name="📊 Статистика",
+        value=f"• Серверов: **{len(bot.guilds)}**\n"
+              f"• Пользователей: **{sum(g.member_count for g in bot.guilds)}**\n"
+              f"• Команд: **{len(bot.tree.get_commands())}**",
+        inline=False
+    )
+    embed.add_field(
+        name="🔧 Быстрые команды",
+        value="• `!sat` - Настроить все тикеты\n"
+              "• `!cat` - Закрыть все тикеты\n"
+              "• `!leave <id>` - Покинуть сервер\n"
+              "• `!servers` - Список серверов",
+        inline=False
+    )
+    embed.add_field(
+        name="📋 Информация",
+        value=f"• Бот: {bot.user.name}\n"
+              f"• ID: {bot.user.id}\n"
+              f"• Разработчик: <@{ALLOWED_IDS[0]}>",
+        inline=False
+    )
+    embed.set_footer(text="Warden Bot | AdminPandel")
+    embed.set_thumbnail(url=bot.user.avatar.url if bot.user.avatar else None)
+
+    class AdminPandelView(discord.ui.View):
+        def __init__(self):
+            super().__init__(timeout=60)
+
+        @discord.ui.button(label="📊 Статус", style=discord.ButtonStyle.primary, emoji="📊")
+        async def status_button(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            if btn_i.user.id not in ALLOWED_IDS:
+                return await btn_i.response.send_message("❌ Эта кнопка только для разработчика!", ephemeral=True)
+
+            # Информация о боте
+            latency = round(bot.latency * 1000)
+            status_embed = discord.Embed(
+                title="📊 Статус бота",
+                color=discord.Color.green(),
+                timestamp=datetime.now()
+            )
+            status_embed.add_field(name="🟢 Пинг", value=f"`{latency} ms`", inline=True)
+            status_embed.add_field(name="🖥️ Серверов", value=f"`{len(bot.guilds)}`", inline=True)
+            status_embed.add_field(name="👥 Пользователей", value=f"`{sum(g.member_count for g in bot.guilds)}`",
+                                   inline=True)
+            status_embed.add_field(name="📁 Каналов", value=f"`{sum(len(g.channels) for g in bot.guilds)}`", inline=True)
+            status_embed.add_field(name="⏰ uptime", value=f"`{str(datetime.now() - start_time).split('.')[0]}`",
+                                   inline=True)
+            status_embed.add_field(name="💾 Память", value=f"`{round(os.getpid() / 1024 / 1024, 2)} MB`", inline=True)
+            status_embed.set_footer(text="Warden Bot | Статус")
+
+            await btn_i.response.send_message(embed=status_embed, ephemeral=True)
+
+        @discord.ui.button(label="⚙️ Настройки", style=discord.ButtonStyle.secondary, emoji="⚙️")
+        async def settings_button(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            if btn_i.user.id not in ALLOWED_IDS:
+                return await btn_i.response.send_message("❌ Эта кнопка только для разработчика!", ephemeral=True)
+
+            settings_embed = discord.Embed(
+                title="⚙️ Настройки бота",
+                description="Управление параметрами бота",
+                color=discord.Color.blue(),
+                timestamp=datetime.now()
+            )
+            settings_embed.add_field(
+                name="🔧 Доступные команды",
+                value="• `!sat` - Настроить все тикеты (ID: 1511417385595306024, 1511393460622463039)\n"
+                      "• `!cat` - Закрыть все тикеты\n"
+                      "• `!leave <id>` - Покинуть сервер\n"
+                      "• `!servers` - Список серверов\n"
+                      "• `/setup-logs` - Настроить канал логов",
+                inline=False
+            )
+            settings_embed.add_field(
+                name="📁 Файлы настроек",
+                value=f"• `lang_settings.json` - Языки\n"
+                      f"• `ticket_settings.json` - Тикеты\n"
+                      f"• `autorole_settings.json` - Авто-роли\n"
+                      f"• `warns.json` - Предупреждения",
+                inline=False
+            )
+            settings_embed.set_footer(text="Warden Bot | Настройки")
+
+            await btn_i.response.send_message(embed=settings_embed, ephemeral=True)
+
+        @discord.ui.button(label="🔒 Закрыть", style=discord.ButtonStyle.danger, emoji="🔒")
+        async def close_button(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            if btn_i.user.id not in ALLOWED_IDS:
+                return await btn_i.response.send_message("❌ Эта кнопка только для разработчика!", ephemeral=True)
+            await btn_i.response.send_message("🔒 Панель закрыта", ephemeral=True)
+            await btn_i.message.delete()
+
+    view = AdminPandelView()
+    await ctx.send(embed=embed, view=view)
+
+
 @bot.tree.command(name='hello', description='Greet Warden bot')
 async def hello(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
 
     embed = discord.Embed(
         title=get_text(str(i.guild_id), 'hello_title'),
@@ -1642,7 +1860,6 @@ async def hello(i: discord.Interaction):
 @bot.tree.command(name='ping', description='Check bot latency')
 async def ping(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
 
     latency = round(bot.latency * 1000)
 
@@ -1668,7 +1885,6 @@ async def ping(i: discord.Interaction):
 @bot.tree.command(name='info', description='Bot information')
 async def info(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     e = discord.Embed(title=get_text(str(i.guild_id), 'info_title'), description=get_text(str(i.guild_id), 'info_desc'),
                       color=discord.Color.blue())
     e.add_field(name=get_text(str(i.guild_id), 'info_version'), value='v1.0.0', inline=True)
@@ -1680,7 +1896,6 @@ async def info(i: discord.Interaction):
 @bot.tree.command(name='help', description='Все команды бота с категориями')
 async def help_command(i: discord.Interaction, category: str = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
 
     lang = get_lang(str(i.guild_id))
 
@@ -1889,9 +2104,127 @@ async def help_command(i: discord.Interaction, category: str = None):
     from datetime import datetime, timedelta, timezone
 
 
+@bot.tree.command(name='autorole', description='Настроить автоматическую выдачу роли новым участникам')
+@app_commands.choices(action=[
+    app_commands.Choice(name='🔧 Включить', value='on'),
+    app_commands.Choice(name='⚙️ Выключить', value='off'),
+    app_commands.Choice(name='📊 Статус', value='status')
+])
+async def autorole(i: discord.Interaction, action: app_commands.Choice[str], role: discord.Role = None):
+    if await check_blacklist(i): return
+    if not i.user.guild_permissions.administrator:
+        embed = discord.Embed(
+            title=get_text(str(i.guild_id), 'autorole_no_permission'),
+            description=get_text(str(i.guild_id), 'autorole_admin_only'),
+            color=discord.Color.red()
+        )
+        embed.set_footer(text=get_text(str(i.guild_id), 'autorole_access_denied'))
+        return await i.response.send_message(embed=embed, ephemeral=True)
+
+    AUTOROLE_FILE = 'autorole_settings.json'
+
+    def load_autorole():
+        if os.path.exists(AUTOROLE_FILE):
+            with open(AUTOROLE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {}
+
+    def save_autorole(settings):
+        with open(AUTOROLE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, indent=4, ensure_ascii=False)
+
+    settings = load_autorole()
+    gid = str(i.guild_id)
+
+    if action.value == 'on':
+        if role is None:
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_error_no_role'),
+                description=get_text(str(i.guild_id), 'autorole_error_no_role_desc'),
+                color=discord.Color.red()
+            )
+            embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+            return await i.response.send_message(embed=embed, ephemeral=True)
+
+        if role.permissions.administrator:
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_warning'),
+                description=get_text(str(i.guild_id), 'autorole_no_admin_role'),
+                color=discord.Color.red()
+            )
+            embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+            return await i.response.send_message(embed=embed, ephemeral=True)
+
+        bot_member = i.guild.get_member(bot.user.id)
+        if role.position >= bot_member.top_role.position:
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_error_role_higher'),
+                description=get_text(str(i.guild_id), 'autorole_role_higher_desc', role.mention),
+                color=discord.Color.red()
+            )
+            embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+            return await i.response.send_message(embed=embed, ephemeral=True)
+
+        settings[gid] = {'enabled': True, 'role_id': role.id}
+        save_autorole(settings)
+
+        embed = discord.Embed(
+            title=get_text(str(i.guild_id), 'autorole_enabled'),
+            description=get_text(str(i.guild_id), 'autorole_enabled_desc', role.mention),
+            color=discord.Color.green(),
+            timestamp=datetime.now()
+        )
+        embed.set_footer(text=get_text(str(i.guild_id), 'autorole_setup_by', i.user.name))
+        await i.response.send_message(embed=embed, ephemeral=True)
+
+    elif action.value == 'off':
+        if gid in settings:
+            settings[gid]['enabled'] = False
+            save_autorole(settings)
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_disabled'),
+                description=get_text(str(i.guild_id), 'autorole_disabled_desc'),
+                color=discord.Color.orange()
+            )
+            embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+            await i.response.send_message(embed=embed, ephemeral=True)
+        else:
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_info'),
+                description=get_text(str(i.guild_id), 'autorole_not_configured'),
+                color=discord.Color.blue()
+            )
+            embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+            await i.response.send_message(embed=embed, ephemeral=True)
+
+    elif action.value == 'status':
+        if gid in settings and settings[gid].get('enabled', False):
+            role_id = settings[gid].get('role_id')
+            role_obj = i.guild.get_role(role_id)
+            if role_obj:
+                embed = discord.Embed(
+                    title=get_text(str(i.guild_id), 'autorole_status_title'),
+                    description=get_text(str(i.guild_id), 'autorole_status_enabled', role_obj.mention, role_id),
+                    color=discord.Color.green()
+                )
+            else:
+                embed = discord.Embed(
+                    title=get_text(str(i.guild_id), 'autorole_status_title'),
+                    description=get_text(str(i.guild_id), 'autorole_status_enabled_no_role'),
+                    color=discord.Color.orange()
+                )
+        else:
+            embed = discord.Embed(
+                title=get_text(str(i.guild_id), 'autorole_status_title'),
+                description=get_text(str(i.guild_id), 'autorole_status_disabled'),
+                color=discord.Color.red()
+            )
+        embed.set_footer(text=get_text(str(i.guild_id), 'autorole_footer'))
+        await i.response.send_message(embed=embed, ephemeral=True)
+
+
 @bot.tree.command(name='setup-ticket', description='🎫 Настроить систему тикетов')
 async def setup_ticket(i: discord.Interaction, category: discord.CategoryChannel, support_role: discord.Role):
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
 
@@ -2010,47 +2343,11 @@ async def setup_ticket(i: discord.Interaction, category: discord.CategoryChannel
     await i.response.send_message('✅ Система тикетов настроена!', ephemeral=True)
 
 
-
 @bot.tree.command(name='mute', description='Заглушить участника')
 async def mute(i: discord.Interaction, user: discord.Member, minutes: int, rule: str, reason: str = "Не указана"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
 
-    if not i.user.guild_permissions.moderate_members:
-        embed = discord.Embed(title="❌ Ошибка", description="У вас нет прав на использование этой команды!", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    bot_member = i.guild.get_member(bot.user.id)
-    if not bot_member.guild_permissions.moderate_members:
-        embed = discord.Embed(title="❌ Ошибка бота", description="У меня нет прав `Управление участниками`! Выдайте мне эту роль.", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    if user.id == i.guild.owner_id:
-        embed = discord.Embed(title="❌ Ошибка", description="Нельзя замутить владельца сервера!", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    if user.bot:
-        embed = discord.Embed(title="❌ Ошибка", description="Нельзя замутить другого бота!", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    if user.top_role >= bot_member.top_role and user.id != i.guild.owner_id:
-        embed = discord.Embed(title="❌ Ошибка", description=f"Не могу замутить {user.mention}! Его роль выше или равна моей.\nПереместите мою роль выше в списке.", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    if minutes <= 0:
-        embed = discord.Embed(title="❌ Ошибка", description="Время должно быть больше 0 минут!", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
-
-    if minutes > 40320:
-        embed = discord.Embed(title="❌ Ошибка", description="Максимум 28 дней (40320 минут)!", color=discord.Color.red())
-        embed.set_footer(text="Warden Bot | Модерация")
-        return await i.response.send_message(embed=embed, ephemeral=True)
+    # ... все ваши проверки прав ...
 
     until = discord.utils.utcnow() + timedelta(minutes=minutes)
 
@@ -2069,57 +2366,90 @@ async def mute(i: discord.Interaction, user: discord.Member, minutes: int, rule:
 
     try:
         await user.timeout(until, reason=audit_reason)
-        embed = discord.Embed(title='🔇 Мут | Наказание', description=f'**{user.mention}** получил мут на `{time_text}`', color=discord.Color.orange(), timestamp=datetime.now())
+
+        embed = discord.Embed(
+            title='🔇 Мут | Наказание',
+            description=f'**{user.mention}** получил мут на `{time_text}`',
+            color=discord.Color.orange(),
+            timestamp=datetime.now()
+        )
         embed.add_field(name='📋 Правило', value=rule, inline=False)
         embed.add_field(name='📝 Причина', value=reason, inline=False)
         embed.add_field(name='👮 Модератор', value=i.user.mention, inline=False)
         embed.set_footer(text=f'ID: {user.id} • Warden Bot')
+
         await i.response.send_message(embed=embed)
-        await send_log(i.guild_id, embed)
+
+        # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+        await send_mod_log(i.guild_id, "Мут", i.user, user, reason, rule, time_text)
+
     except discord.Forbidden:
-        embed = discord.Embed(title="❌ Ошибка", description=f"Не хватает прав для мута {user.mention}!\nПроверьте, что моя роль выше его роли.", color=discord.Color.red())
+        embed = discord.Embed(title="❌ Ошибка",
+                              description=f"Не хватает прав для мута {user.mention}!\nПроверьте, что моя роль выше его роли.",
+                              color=discord.Color.red())
         embed.set_footer(text="Warden Bot | Модерация")
         await i.response.send_message(embed=embed, ephemeral=True)
     except Exception as e:
-        embed = discord.Embed(title="❌ Ошибка", description=f"Не удалось замутить пользователя: {str(e)[:100]}", color=discord.Color.red())
+        embed = discord.Embed(title="❌ Ошибка", description=f"Не удалось замутить пользователя: {str(e)[:100]}",
+                              color=discord.Color.red())
         embed.set_footer(text="Warden Bot | Модерация")
         await i.response.send_message(embed=embed, ephemeral=True)
 
 
-@bot.tree.command(name='unmute', description='Unmute a member')
+@bot.tree.command(name='unmute', description='Снять мут с участника')
 async def unmute(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.moderate_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
     if member.timed_out_until is None:
         return await i.response.send_message(get_text(str(i.guild_id), 'not_muted'), ephemeral=True)
+
     await member.timeout(None)
-    embed = discord.Embed(title="🔊 Снятие мута", description=get_text(str(i.guild_id), 'unmuted', member.mention), color=discord.Color.green(), timestamp=datetime.now())
+
+    embed = discord.Embed(
+        title="🔊 Снятие мута",
+        description=get_text(str(i.guild_id), 'unmuted', member.mention),
+        color=discord.Color.green(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
     embed.set_footer(text="Warden Bot | Модерация")
+
     await i.response.send_message(embed=embed, ephemeral=True)
+
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, "Снятие мута", i.user, member, "Мут снят")
 
 
 @bot.tree.command(name='ban', description='Забанить участника')
 async def ban(i: discord.Interaction, user: discord.Member, rule: str, reason: str = "Не указана"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.ban_members:
         return await i.response.send_message('❌ Нет прав!', ephemeral=True)
 
     if user.top_role >= i.user.top_role and i.user.id != i.guild.owner_id:
-        return await i.response.send_message('❌ Нельзя забанить пользователя с ролью выше или равной вашей!', ephemeral=True)
+        return await i.response.send_message('❌ Нельзя забанить пользователя с ролью выше или равной вашей!',
+                                             ephemeral=True)
 
     audit_reason = f"Модератор: {i.user} (ID: {i.user.id}) | Правило: {rule} | Причина: {reason}"
     await user.ban(reason=audit_reason)
 
-    embed = discord.Embed(title='🔨 Бан | Наказание', description=f'{user.mention} был забанен', color=discord.Color.red(), timestamp=datetime.now())
+    embed = discord.Embed(
+        title='🔨 Бан | Наказание',
+        description=f'{user.mention} был забанен',
+        color=discord.Color.red(),
+        timestamp=datetime.now()
+    )
     embed.add_field(name='📋 Правило', value=rule, inline=False)
     embed.add_field(name='📝 Причина', value=reason, inline=False)
     embed.add_field(name='👮 Модератор', value=i.user.mention, inline=False)
     embed.set_footer(text=f'ID: {user.id} • Warden Bot')
+
     await i.response.send_message(embed=embed)
-    await send_log(i.guild_id, embed)
+
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, "Бан", i.user, user, reason, rule)
 
     try:
         await user.send(f'🔨 Вы были забанены на сервере **{i.guild.name}**\n📋 Правило: {rule}\n📝 Причина: {reason}')
@@ -2130,7 +2460,6 @@ async def ban(i: discord.Interaction, user: discord.Member, rule: str, reason: s
 @bot.tree.command(name='unban', description='Разбанить пользователя по ID')
 async def unban(i: discord.Interaction, userid: str, reason: str = "Не указана"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.ban_members:
         return await i.response.send_message('❌ Нет прав!', ephemeral=True)
 
@@ -2144,12 +2473,20 @@ async def unban(i: discord.Interaction, userid: str, reason: str = "Не ука�
 
         await i.guild.unban(user, reason=reason)
 
-        embed = discord.Embed(title='🔓 Разбан', description=f'{user.mention} был разбанен', color=discord.Color.green(), timestamp=datetime.now())
+        embed = discord.Embed(
+            title='🔓 Разбан',
+            description=f'{user.mention} был разбанен',
+            color=discord.Color.green(),
+            timestamp=datetime.now()
+        )
         embed.add_field(name='📝 Причина', value=reason, inline=False)
         embed.add_field(name='👮 Модератор', value=i.user.mention, inline=False)
         embed.set_footer(text=f'ID: {user.id} • Warden Bot')
+
         await i.response.send_message(embed=embed)
-        await send_log(i.guild_id, embed)
+
+        # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+        await send_mod_log(i.guild_id, "Разбан", i.user, user, reason)
 
     except ValueError:
         await i.response.send_message('❌ Неверный формат ID!', ephemeral=True)
@@ -2162,22 +2499,34 @@ async def unban(i: discord.Interaction, userid: str, reason: str = "Не ука�
 @bot.tree.command(name='kick', description='Kick a member')
 async def kick(i: discord.Interaction, member: discord.Member, reason: str = "Not specified"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
-    await member.kick(reason=reason)
-    embed = discord.Embed(title="👢 Кик", description=get_text(str(i.guild_id), 'kicked', member.mention), color=discord.Color.orange(), timestamp=datetime.now())
+
+    audit_reason = f"Модератор: {i.user} (ID: {i.user.id}) | Причина: {reason}"
+    await member.kick(reason=audit_reason)
+
+    embed = discord.Embed(
+        title="👢 Кик",
+        description=get_text(str(i.guild_id), 'kicked', member.mention),
+        color=discord.Color.orange(),
+        timestamp=datetime.now()
+    )
     embed.add_field(name="📝 Причина", value=reason)
+    embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
     embed.set_footer(text="Warden Bot | Модерация")
+
     await i.response.send_message(embed=embed, ephemeral=True)
+
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, "Кик", i.user, member, reason)
 
 
 @bot.tree.command(name='warn', description='Warn a member')
 async def warn(i: discord.Interaction, member: discord.Member, reason: str = "Not specified"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
     w = load(WARNS_FILE)
     gid, uid = str(i.guild_id), str(member.id)
     if gid not in w: w[gid] = {}
@@ -2185,16 +2534,26 @@ async def warn(i: discord.Interaction, member: discord.Member, reason: str = "No
     wid = len(w[gid][uid]) + 1
     w[gid][uid].append({'id': wid, 'reason': reason, 'mod': i.user.id, 'date': datetime.now().isoformat()})
     save(WARNS_FILE, w)
-    embed = discord.Embed(title="⚠️ Выдано предупреждение", description=get_text(str(i.guild_id), 'warned', member.mention, wid), color=discord.Color.yellow(), timestamp=datetime.now())
+
+    embed = discord.Embed(
+        title="⚠️ Выдано предупреждение",
+        description=get_text(str(i.guild_id), 'warned', member.mention, wid),
+        color=discord.Color.yellow(),
+        timestamp=datetime.now()
+    )
     embed.add_field(name="📝 Причина", value=reason)
+    embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
     embed.set_footer(text=f"ID: {member.id} • Warden Bot")
+
     await i.response.send_message(embed=embed, ephemeral=True)
+
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, f"Предупреждение #{wid}", i.user, member, reason)
 
 
 @bot.tree.command(name='warnings', description='Show warnings')
 async def warnings(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     w = load(WARNS_FILE).get(str(i.guild_id), {}).get(str(member.id), [])
@@ -2211,7 +2570,6 @@ async def warnings(i: discord.Interaction, member: discord.Member):
 @bot.tree.command(name='topwarnings', description='Top warnings')
 async def topwarnings(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     w = load(WARNS_FILE).get(str(i.guild_id), {})
@@ -2229,30 +2587,42 @@ async def topwarnings(i: discord.Interaction):
     await i.response.send_message(embed=e, ephemeral=True)
 
 
-@bot.tree.command(name='unwarn', description='Remove warning')
+@bot.tree.command(name='unwarn', description='Снять предупреждение')
 async def unwarn(i: discord.Interaction, member: discord.Member, warn_id: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
     w = load(WARNS_FILE)
     gid, uid = str(i.guild_id), str(member.id)
     if gid not in w or uid not in w[gid]:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_warnings', member.mention), ephemeral=True)
+
     for idx, ww in enumerate(w[gid][uid]):
         if ww['id'] == warn_id:
             w[gid][uid].pop(idx)
             save(WARNS_FILE, w)
-            embed = discord.Embed(title="✅ Предупреждение снято", description=get_text(str(i.guild_id), 'warn_removed', warn_id), color=discord.Color.green())
+
+            embed = discord.Embed(
+                title="✅ Предупреждение снято",
+                description=get_text(str(i.guild_id), 'warn_removed', warn_id),
+                color=discord.Color.green()
+            )
+            embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
             embed.set_footer(text="Warden Bot | Модерация")
-            return await i.response.send_message(embed=embed, ephemeral=True)
+
+            await i.response.send_message(embed=embed, ephemeral=True)
+
+            # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+            await send_mod_log(i.guild_id, f"Снятие предупреждения #{warn_id}", i.user, member, "Предупреждение снято")
+            return
+
     await i.response.send_message(get_text(str(i.guild_id), 'warn_not_found', warn_id), ephemeral=True)
 
 
 @bot.tree.command(name='slowmode', description='Set slowmode')
 async def slowmode(i: discord.Interaction, channel: discord.TextChannel, seconds: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await channel.edit(slowmode_delay=seconds)
@@ -2264,7 +2634,6 @@ async def slowmode(i: discord.Interaction, channel: discord.TextChannel, seconds
 @bot.tree.command(name='lock', description='Lock channel')
 async def lock(i: discord.Interaction, channel: discord.TextChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await channel.set_permissions(i.guild.default_role, send_messages=False)
@@ -2276,7 +2645,6 @@ async def lock(i: discord.Interaction, channel: discord.TextChannel):
 @bot.tree.command(name='unlock', description='Unlock channel')
 async def unlock(i: discord.Interaction, channel: discord.TextChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await channel.set_permissions(i.guild.default_role, send_messages=None)
@@ -2288,7 +2656,6 @@ async def unlock(i: discord.Interaction, channel: discord.TextChannel):
 @bot.tree.command(name='report', description='Report user')
 async def report(i: discord.Interaction, user: discord.Member, reason: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     e = discord.Embed(title='📢 Report', description=f'{i.user.mention} reported {user.mention}', color=discord.Color.red())
     e.add_field(name='Reason', value=reason)
     e.set_footer(text="Warden Bot | Жалоба")
@@ -2299,7 +2666,6 @@ async def report(i: discord.Interaction, user: discord.Member, reason: str):
 @bot.tree.command(name='pin', description='Pin message')
 async def pin(i: discord.Interaction, message_id: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_messages:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     try:
@@ -2314,7 +2680,6 @@ async def pin(i: discord.Interaction, message_id: str):
 @bot.tree.command(name='unpin', description='Unpin message')
 async def unpin(i: discord.Interaction, message_id: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_messages:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     try:
@@ -2329,7 +2694,6 @@ async def unpin(i: discord.Interaction, message_id: str):
 @bot.tree.command(name='vmute', description='Заглушить в голосовом канале')
 async def vmute(i: discord.Interaction, user: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.mute_members:
         return await i.response.send_message('❌ Нет прав!', ephemeral=True)
 
@@ -2348,7 +2712,6 @@ async def vmute(i: discord.Interaction, user: discord.Member):
 @bot.tree.command(name='vunmute', description='Unmute in voice')
 async def vunmute(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.mute_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     if member.voice:
@@ -2362,7 +2725,6 @@ async def vunmute(i: discord.Interaction, member: discord.Member):
 @bot.tree.command(name='vdeafen', description='Deafen in voice')
 async def vdeafen(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.deafen_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     if member.voice:
@@ -2376,7 +2738,6 @@ async def vdeafen(i: discord.Interaction, member: discord.Member):
 @bot.tree.command(name='vundeafen', description='Undeafen in voice')
 async def vundeafen(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.deafen_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     if member.voice:
@@ -2390,7 +2751,6 @@ async def vundeafen(i: discord.Interaction, member: discord.Member):
 @bot.tree.command(name='vkick', description='Kick from voice')
 async def vkick(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.move_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     if member.voice:
@@ -2404,7 +2764,6 @@ async def vkick(i: discord.Interaction, member: discord.Member):
 @bot.tree.command(name='vmove', description='Move in voice')
 async def vmove(i: discord.Interaction, member: discord.Member, channel: discord.VoiceChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.move_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     if member.voice:
@@ -2418,8 +2777,6 @@ async def vmove(i: discord.Interaction, member: discord.Member, channel: discord
 @bot.tree.command(name='serverinfo', description='Server info')
 async def serverinfo(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-
     g = i.guild
     e = discord.Embed(
         title=get_text(str(i.guild_id), 'serverinfo_title', g.name),
@@ -2438,8 +2795,6 @@ async def serverinfo(i: discord.Interaction):
 @bot.tree.command(name='userinfo', description='User info')
 async def userinfo(i: discord.Interaction, member: discord.Member = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-
     m = member or i.user
     e = discord.Embed(
         title=get_text(str(i.guild_id), 'userinfo_title', m.name),
@@ -2460,8 +2815,6 @@ async def userinfo(i: discord.Interaction, member: discord.Member = None):
 @bot.tree.command(name='avatar', description='Show avatar')
 async def avatar(i: discord.Interaction, member: discord.Member = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-
     m = member or i.user
     e = discord.Embed(
         title=get_text(str(i.guild_id), 'avatar_title', m.name),
@@ -2475,8 +2828,6 @@ async def avatar(i: discord.Interaction, member: discord.Member = None):
 @bot.tree.command(name='admins', description='Server admins')
 async def admins(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-
     admins_list = [m.mention for m in i.guild.members if m.guild_permissions.administrator]
     embed = discord.Embed(
         title=get_text(str(i.guild_id), 'admins_title'),
@@ -2490,8 +2841,6 @@ async def admins(i: discord.Interaction):
 @bot.tree.command(name='bots', description='Bots on server')
 async def bots(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-
     bots_list = [m.mention for m in i.guild.members if m.bot]
     embed = discord.Embed(
         title=get_text(str(i.guild_id), 'bots_title'),
@@ -2505,31 +2854,63 @@ async def bots(i: discord.Interaction):
 @bot.tree.command(name='timeout', description='Timeout member')
 async def timeout(i: discord.Interaction, member: discord.Member, minutes: int, reason: str = "Not specified"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.moderate_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
-    await member.timeout(datetime.now() + timedelta(minutes=minutes), reason=reason)
-    embed = discord.Embed(title="⏰ Таймаут", description=get_text(str(i.guild_id), 'timeout_set', member.mention, minutes), color=discord.Color.orange(), timestamp=datetime.now())
+
+    audit_reason = f"Модератор: {i.user} (ID: {i.user.id}) | Причина: {reason}"
+    await member.timeout(datetime.now() + timedelta(minutes=minutes), reason=audit_reason)
+
+    time_text = f"{minutes} мин"
+
+    embed = discord.Embed(
+        title="⏰ Таймаут",
+        description=get_text(str(i.guild_id), 'timeout_set', member.mention, minutes),
+        color=discord.Color.orange(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="📝 Причина", value=reason)
+    embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
     embed.set_footer(text="Warden Bot | Модерация")
+
     await i.response.send_message(embed=embed, ephemeral=True)
 
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, "Таймаут", i.user, member, reason, None, time_text)
 
-@bot.tree.command(name='untimeout', description='Remove timeout')
+
+@bot.tree.command(name='untimeout', description='Снять таймаут')
 async def untimeout(i: discord.Interaction, member: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.moderate_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
+    # Проверка, есть ли таймаут
+    if member.timed_out_until is None:
+        embed = discord.Embed(title="ℹ️ Информация", description="У пользователя нет активного таймаута!",
+                              color=discord.Color.blue())
+        embed.set_footer(text="Warden Bot | Модерация")
+        return await i.response.send_message(embed=embed, ephemeral=True)
+
     await member.timeout(None)
-    embed = discord.Embed(title="✅ Таймаут снят", description=get_text(str(i.guild_id), 'timeout_removed', member.mention), color=discord.Color.green())
+
+    embed = discord.Embed(
+        title="✅ Таймаут снят",
+        description=get_text(str(i.guild_id), 'timeout_removed', member.mention),
+        color=discord.Color.green(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
     embed.set_footer(text="Warden Bot | Модерация")
+
     await i.response.send_message(embed=embed, ephemeral=True)
+
+    # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+    await send_mod_log(i.guild_id, "Снятие таймаута", i.user, member, "Таймаут снят")
 
 
 @bot.tree.command(name='softban', description='Softban')
 async def softban(i: discord.Interaction, member: discord.Member, reason: str = "Not specified"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.ban_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await member.ban(reason=reason)
@@ -2542,11 +2923,19 @@ async def softban(i: discord.Interaction, member: discord.Member, reason: str = 
 @bot.tree.command(name='authors', description='Показать список авторов и разработчиков бота')
 async def authors(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
+    # Проверяем, не наступило ли 14 июня 2 часа ночи (день рождения Andy.wirus)
+    now = datetime.now()
+    birthday = datetime(now.year, 6, 14, 2, 0, 0)
+
+    # Если сегодня 14 июня и время после 2 часов ночи
+    if now.month == 6 and now.day == 14 and now.hour >= 2:
+        birthday_text = "\n\n**🎉 С ДНЁМ РОЖДЕНИЯ, ANDY.WIRUS! 🎉**\n*Желаем счастья, здоровья и успехов!*"
+    else:
+        birthday_text = ""
 
     embed = discord.Embed(
         title=get_text(str(i.guild_id), 'authors_title'),
-        description=get_text(str(i.guild_id), 'authors_desc'),
+        description=get_text(str(i.guild_id), 'authors_desc') + birthday_text,
         color=discord.Color.blue(),
         timestamp=datetime.now()
     )
@@ -2590,7 +2979,6 @@ async def authors(i: discord.Interaction):
 @bot.tree.command(name='massban', description='Mass ban')
 async def massban(i: discord.Interaction, ids: str, reason: str = "Not specified"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.ban_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     ids_list = ids.split()
@@ -2610,7 +2998,6 @@ async def massban(i: discord.Interaction, ids: str, reason: str = "Not specified
 @bot.tree.command(name='clean', description='Clean bot messages')
 async def clean(i: discord.Interaction, amount: int = 10):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_messages:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     deleted = 0
@@ -2626,7 +3013,6 @@ async def clean(i: discord.Interaction, amount: int = 10):
 @bot.tree.command(name='strike', description='Give strike')
 async def strike(i: discord.Interaction, user: discord.Member, reason: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     w = load(WARNS_FILE)
@@ -2642,30 +3028,42 @@ async def strike(i: discord.Interaction, user: discord.Member, reason: str):
     await i.response.send_message(embed=embed, ephemeral=True)
 
 
-@bot.tree.command(name='unstrike', description='Remove strike')
+@bot.tree.command(name='unstrike', description='Снять страйк')
 async def unstrike(i: discord.Interaction, user: discord.Member, sid: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
+
     w = load(WARNS_FILE)
     gid, uid = str(i.guild_id), str(user.id)
     if gid not in w or uid not in w[gid]:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_strikes', user.mention), ephemeral=True)
+
     for idx, s in enumerate(w[gid][uid]):
         if s['id'] == sid:
             w[gid][uid].pop(idx)
             save(WARNS_FILE, w)
-            embed = discord.Embed(title="✅ Страйк снят", description=get_text(str(i.guild_id), 'strike_removed', sid, user.mention), color=discord.Color.green())
+
+            embed = discord.Embed(
+                title="✅ Страйк снят",
+                description=get_text(str(i.guild_id), 'strike_removed', sid, user.mention),
+                color=discord.Color.green()
+            )
+            embed.add_field(name="👮 Модератор", value=i.user.mention, inline=False)
             embed.set_footer(text="Warden Bot | Модерация")
-            return await i.response.send_message(embed=embed, ephemeral=True)
+
+            await i.response.send_message(embed=embed, ephemeral=True)
+
+            # 🔥 ЛОГ В КАНАЛ ЛОГОВ
+            await send_mod_log(i.guild_id, f"Снятие страйка #{sid}", i.user, user, "Страйк снят")
+            return
+
     await i.response.send_message(get_text(str(i.guild_id), 'strike_not_found', sid), ephemeral=True)
 
 
 @bot.tree.command(name='strikes', description='Show strikes')
 async def strikes(i: discord.Interaction, user: discord.Member):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     w = load(WARNS_FILE).get(str(i.guild_id), {}).get(str(user.id), [])
@@ -2682,7 +3080,6 @@ async def strikes(i: discord.Interaction, user: discord.Member):
 @bot.tree.command(name='topstrikes', description='Top strikes')
 async def topstrikes(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.kick_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     w = load(WARNS_FILE).get(str(i.guild_id), {})
@@ -2702,7 +3099,6 @@ async def topstrikes(i: discord.Interaction):
 @bot.tree.command(name='setnick', description='Set nickname')
 async def setnick(i: discord.Interaction, member: discord.Member, nick: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_nicknames:
         embed = discord.Embed(title="❌ Ошибка", description=get_text(str(i.guild_id), 'no_permission'), color=discord.Color.red())
         embed.set_footer(text="Warden Bot | Модерация")
@@ -2744,7 +3140,6 @@ async def setnick(i: discord.Interaction, member: discord.Member, nick: str):
 @bot.tree.command(name='setupantinuke', description='Setup antinuke')
 async def setupantinuke(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     embed = discord.Embed(title="🛡️ Анти-нук", description=get_text(str(i.guild_id), 'antinuke_configured'), color=discord.Color.green())
@@ -2755,7 +3150,6 @@ async def setupantinuke(i: discord.Interaction):
 @bot.tree.command(name='addrole', description='Add role')
 async def addrole(i: discord.Interaction, member: discord.Member, role: discord.Role):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_roles:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await member.add_roles(role)
@@ -2767,7 +3161,6 @@ async def addrole(i: discord.Interaction, member: discord.Member, role: discord.
 @bot.tree.command(name='removerole', description='Remove role')
 async def removerole(i: discord.Interaction, member: discord.Member, role: discord.Role):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_roles:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await member.remove_roles(role)
@@ -2779,7 +3172,6 @@ async def removerole(i: discord.Interaction, member: discord.Member, role: disco
 @bot.tree.command(name='createrole', description='Create role')
 async def createrole(i: discord.Interaction, name: str, color: str = "default"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_roles:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     cols = {'red': 0xff0000, 'green': 0x00ff00, 'blue': 0x0000ff, 'yellow': 0xffff00, 'purple': 0xff00ff, 'default': 0x99aab5}
@@ -2793,7 +3185,6 @@ async def createrole(i: discord.Interaction, name: str, color: str = "default"):
 @bot.tree.command(name='deleterole', description='Delete role')
 async def deleterole(i: discord.Interaction, role: discord.Role):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_roles:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await role.delete()
@@ -2805,7 +3196,6 @@ async def deleterole(i: discord.Interaction, role: discord.Role):
 @bot.tree.command(name='reactionrole', description='Reaction role')
 async def reactionrole(i: discord.Interaction, msg_id: str, role: discord.Role, emoji: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_roles:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     try:
@@ -2823,7 +3213,6 @@ async def reactionrole(i: discord.Interaction, msg_id: str, role: discord.Role, 
 @bot.tree.command(name='createchannel', description='Create channel')
 async def createchannel(i: discord.Interaction, name: str, category: discord.CategoryChannel = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await i.guild.create_text_channel(name, category=category)
@@ -2834,7 +3223,6 @@ async def createchannel(i: discord.Interaction, name: str, category: discord.Cat
 @bot.tree.command(name='deletechannel', description='Delete channel')
 async def deletechannel(i: discord.Interaction, ch: discord.TextChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await ch.delete()
@@ -2845,7 +3233,6 @@ async def deletechannel(i: discord.Interaction, ch: discord.TextChannel):
 @bot.tree.command(name='clonechannel', description='Clone channel')
 async def clonechannel(i: discord.Interaction, ch: discord.TextChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await ch.clone()
@@ -2856,7 +3243,6 @@ async def clonechannel(i: discord.Interaction, ch: discord.TextChannel):
 @bot.tree.command(name='movechannel', description='Move channel')
 async def movechannel(i: discord.Interaction, ch: discord.TextChannel, pos: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_channels:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     await ch.edit(position=pos)
@@ -2870,7 +3256,6 @@ level_data = {}
 @bot.tree.command(name='promotion', description='Your level')
 async def promotion(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     uid = str(i.user.id)
     lvl = level_data.get(uid, {}).get('level', 0)
     xp = level_data.get(uid, {}).get('xp', 0)
@@ -2882,7 +3267,6 @@ async def promotion(i: discord.Interaction):
 @bot.tree.command(name='setuppromotion', description='Setup leveling')
 async def setuppromotion(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     embed = discord.Embed(title="⚙️ Настройка уровней", description=get_text(str(i.guild_id), 'settings_saved'), color=discord.Color.green())
@@ -2892,7 +3276,6 @@ async def setuppromotion(i: discord.Interaction):
 @bot.tree.command(name='leaderboard', description='Level leaderboard')
 async def leaderboard(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     sorted_users = sorted(level_data.items(), key=lambda x: x[1].get('xp', 0), reverse=True)[:10]
     text = ''
     for idx, (uid, data) in enumerate(sorted_users, 1):
@@ -2909,7 +3292,6 @@ async def leaderboard(i: discord.Interaction):
 @bot.tree.command(name='addxp', description='Add XP')
 async def addxp(i: discord.Interaction, member: discord.Member, xp: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     uid = str(member.id)
@@ -2923,7 +3305,6 @@ async def addxp(i: discord.Interaction, member: discord.Member, xp: int):
 @bot.tree.command(name='setxp', description='Set XP')
 async def setxp(i: discord.Interaction, member: discord.Member, xp: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     uid = str(member.id)
@@ -2937,7 +3318,6 @@ async def setxp(i: discord.Interaction, member: discord.Member, xp: int):
 @bot.tree.command(name='setlevel', description='Set level')
 async def setlevel(i: discord.Interaction, member: discord.Member, lvl: int):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     uid = str(member.id)
@@ -2951,7 +3331,6 @@ async def setlevel(i: discord.Interaction, member: discord.Member, lvl: int):
 @bot.tree.command(name='calc', description='Calculate')
 async def calc(i: discord.Interaction, expression: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     try:
         res = eval(expression.replace('^', '**'))
         embed = discord.Embed(title="🧮 Калькулятор", description=get_text(str(i.guild_id), 'calc_result', expression, res), color=discord.Color.green())
@@ -2964,7 +3343,6 @@ async def calc(i: discord.Interaction, expression: str):
 @bot.tree.command(name='poll', description='Create a poll')
 async def poll(i: discord.Interaction, question: str, opt1: str, opt2: str, opt3: str = None, opt4: str = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.manage_messages:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     opts = [opt1, opt2]
@@ -2988,7 +3366,6 @@ afk_data = {}
 @bot.tree.command(name='afk', description='Set AFK')
 async def afk(i: discord.Interaction, reason: str = "AFK"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     afk_data[str(i.user.id)] = reason
     embed = discord.Embed(title="💤 AFK режим", description=get_text(str(i.guild_id), 'afk_set', i.user.mention, reason), color=discord.Color.orange())
     embed.set_footer(text="Warden Bot | AFK")
@@ -2998,7 +3375,6 @@ async def afk(i: discord.Interaction, reason: str = "AFK"):
 @bot.tree.command(name='unafk', description='Remove AFK')
 async def unafk(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if str(i.user.id) in afk_data:
         del afk_data[str(i.user.id)]
         embed = discord.Embed(title="✅ AFK снят", description=get_text(str(i.guild_id), 'afk_removed'), color=discord.Color.green())
@@ -3010,7 +3386,6 @@ async def unafk(i: discord.Interaction):
 @bot.tree.command(name='remindme', description='Set reminder')
 async def remindme(i: discord.Interaction, time: str, reminder: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     try:
         unit = time[-1]
         amount = int(time[:-1])
@@ -3026,7 +3401,6 @@ async def remindme(i: discord.Interaction, time: str, reminder: str):
 @bot.tree.command(name='timestamp', description='Current timestamp')
 async def timestamp(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     embed = discord.Embed(title="🕐 Текущий timestamp", description=get_text(str(i.guild_id), 'timestamp_current', int(datetime.now().timestamp())), color=discord.Color.blue())
     embed.set_footer(text="Warden Bot | Утилиты")
     await i.response.send_message(embed=embed, ephemeral=True)
@@ -3035,7 +3409,6 @@ async def timestamp(i: discord.Interaction):
 @bot.tree.command(name='color', description='Color info')
 async def color(i: discord.Interaction, hex_code: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     try:
         color = int(hex_code.strip('#'), 16)
         e = discord.Embed(title=get_text(str(i.guild_id), 'color_info', hex_code), color=color)
@@ -3049,7 +3422,6 @@ async def color(i: discord.Interaction, hex_code: str):
 @bot.tree.command(name='qr-code', description='Generate QR code')
 async def qr_code(i: discord.Interaction, text: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     url = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={text}"
     e = discord.Embed(title=get_text(str(i.guild_id), 'qr_code_title'), color=0x3498db)
     e.set_image(url=url)
@@ -3063,7 +3435,6 @@ start_time = datetime.now()
 @bot.tree.command(name='uptime', description='Bot uptime')
 async def uptime(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     delta = datetime.now() - start_time
     embed = discord.Embed(title="🕐 Время работы бота", description=get_text(str(i.guild_id), 'uptime_text', delta.days, delta.seconds // 3600, (delta.seconds % 3600) // 60), color=discord.Color.green())
     embed.set_footer(text="Warden Bot | Статистика")
@@ -3076,7 +3447,6 @@ giveaways = {}
 @bot.tree.command(name='giveaway', description='Start a giveaway')
 async def giveaway(i: discord.Interaction, duration: str, prize: str, winners: int = 1):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     try:
@@ -3097,7 +3467,6 @@ async def giveaway(i: discord.Interaction, duration: str, prize: str, winners: i
 @bot.tree.command(name='cat', description='Random cat')
 async def cat(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://api.thecatapi.com/v1/images/search') as r:
             data = await r.json()
@@ -3110,7 +3479,6 @@ async def cat(i: discord.Interaction):
 @bot.tree.command(name='roll', description='Roll dice')
 async def roll(i: discord.Interaction, sides: int = 6):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     result = random.randint(1, sides)
     embed = discord.Embed(title="🎲 Бросок кубика", description=get_text(str(i.guild_id), 'roll_result', result, sides), color=discord.Color.blue())
     embed.set_footer(text="Warden Bot | Игры")
@@ -3120,7 +3488,6 @@ async def roll(i: discord.Interaction, sides: int = 6):
 @bot.tree.command(name='8ball', description='Magic 8ball')
 async def eightball(i: discord.Interaction, question: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
 
     answers_ru = [
         'Да', 'Нет', 'Возможно', 'Определённо да!',
@@ -3154,7 +3521,6 @@ async def eightball(i: discord.Interaction, question: str):
 @bot.tree.command(name='joke', description='Random joke')
 async def joke(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://v2.jokeapi.dev/joke/Any?safe-mode') as r:
             data = await r.json()
@@ -3169,7 +3535,6 @@ async def joke(i: discord.Interaction):
 @bot.tree.command(name='fact', description='Random fact')
 async def fact(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://uselessfacts.jsph.pl/random.json?language=en') as r:
             data = await r.json()
@@ -3181,7 +3546,6 @@ async def fact(i: discord.Interaction):
 @bot.tree.command(name='advice', description='Random advice')
 async def advice(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://api.adviceslip.com/advice') as r:
             data = await r.json()
@@ -3193,7 +3557,6 @@ async def advice(i: discord.Interaction):
 @bot.tree.command(name='quote', description='Random quote')
 async def quote(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://api.quotable.io/random') as r:
             data = await r.json()
@@ -3205,7 +3568,6 @@ async def quote(i: discord.Interaction):
 @bot.tree.command(name='trivia', description='Trivia question')
 async def trivia(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     async with aiohttp.ClientSession() as s:
         async with s.get('https://opentdb.com/api.php?amount=1&type=multiple') as r:
             data = await r.json()
@@ -3218,7 +3580,6 @@ async def trivia(i: discord.Interaction):
 @bot.tree.command(name='rps', description='Rock Paper Scissors')
 async def rps(i: discord.Interaction, choice: str):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     choices = ['rock', 'paper', 'scissors']
     if choice.lower() not in choices:
         return await i.response.send_message(get_text(str(i.guild_id), 'error', 'Choose: rock, paper, scissors'), ephemeral=True)
@@ -3237,7 +3598,6 @@ async def rps(i: discord.Interaction, choice: str):
 @bot.tree.command(name='flip', description='Flip coin')
 async def flip(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     result = random.choice([get_text(str(i.guild_id), 'flip_heads'), get_text(str(i.guild_id), 'flip_tails')])
     embed = discord.Embed(title="🪙 Монетка", description=f'Выпал **{result}**!', color=discord.Color.blue())
     embed.set_footer(text="Warden Bot | Игры")
@@ -3247,7 +3607,6 @@ async def flip(i: discord.Interaction):
 @bot.tree.command(name='setup-logs', description='Setup logging channel')
 async def setup_logs(i: discord.Interaction, channel: discord.TextChannel):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
 
@@ -3261,7 +3620,6 @@ async def setup_logs(i: discord.Interaction, channel: discord.TextChannel):
 @bot.tree.command(name='setup-welcome', description='Setup welcome message')
 async def setup_welcome(i: discord.Interaction, channel: discord.TextChannel, message: str = "Welcome {member}!"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
 
@@ -3284,7 +3642,6 @@ async def setup_welcome(i: discord.Interaction, channel: discord.TextChannel, me
 @bot.tree.command(name='disable-welcome', description='Disable welcome')
 async def disable_welcome(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     s = load(WELCOME_SETTINGS_FILE)
@@ -3301,7 +3658,6 @@ async def disable_welcome(i: discord.Interaction):
 @bot.tree.command(name='setup-captcha', description='Setup captcha')
 async def setup_captcha(i: discord.Interaction, role: discord.Role):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
 
@@ -3599,7 +3955,6 @@ async def delete_application(i: discord.Interaction, id_заявки: str):
 @bot.tree.command(name='massunban', description='Разбан всех пользователей на сервере')
 async def massunban(i: discord.Interaction, reason: str = "Массовый разбан"):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.ban_members:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     banned_users = [entry async for entry in i.guild.bans()]
@@ -3626,7 +3981,6 @@ async def massunban(i: discord.Interaction, reason: str = "Массовый ра
 @bot.tree.command(name='disable-captcha', description='Disable captcha')
 async def disable_captcha(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     s = load(CAPTCHA_SETTINGS_FILE)
@@ -3641,7 +3995,6 @@ async def disable_captcha(i: discord.Interaction):
 @bot.tree.command(name='setup-application', description='Setup roles for applications')
 async def setup_application(i: discord.Interaction, moderator: discord.Role = None, administrator: discord.Role = None):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     s = load(SETTINGS_FILE)
@@ -3657,7 +4010,6 @@ async def setup_application(i: discord.Interaction, moderator: discord.Role = No
 @bot.tree.command(name='create-apps', description='Create application menu')
 async def create_apps(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message(get_text(str(i.guild_id), 'no_permission'), ephemeral=True)
     s = load(SETTINGS_FILE).get(str(i.guild_id), {})
@@ -3701,16 +4053,35 @@ async def on_ready():
 
     bot.add_view(TicketView())
 
+
 @bot.tree.command(name='invite', description='Invite bot')
 async def invite(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
-    e = discord.Embed(title=get_text(str(i.guild_id), 'invite_title'), description=get_text(str(i.guild_id), 'invite_desc'), color=discord.Color.blue())
-    if i.guild.icon: e.set_thumbnail(url=i.guild.icon.url)
-    e.set_footer(text="Warden Bot | Приглашения")
+
+    e = discord.Embed(
+        title=get_text(str(i.guild_id) if i.guild else '0', 'invite_title'),
+        description=get_text(str(i.guild_id) if i.guild else '0', 'invite_desc'),
+        color=discord.Color.blue()
+    )
+
+    # Проверяем, есть ли иконка у сервера (и выполняется ли команда НЕ в ЛС)
+    if i.guild and i.guild.icon:
+        e.set_thumbnail(url=i.guild.icon.url)
+
+    e.set_footer(text=get_text(str(i.guild_id) if i.guild else '0', 'invite_footer'))
+
     view = discord.ui.View()
-    view.add_item(discord.ui.Button(label='🤖 Invite Bot', style=discord.ButtonStyle.link, url=f'https://discord.com/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot%20applications.commands'))
-    view.add_item(discord.ui.Button(label='🌐 Community Server', style=discord.ButtonStyle.link, url='https://discord.gg/invite'))
+    view.add_item(discord.ui.Button(
+        label=get_text(str(i.guild_id) if i.guild else '0', 'invite_button'),
+        style=discord.ButtonStyle.link,
+        url=f'https://discord.com/oauth2/authorize?client_id={bot.user.id}&permissions=8&scope=bot%20applications.commands'
+    ))
+    view.add_item(discord.ui.Button(
+        label=get_text(str(i.guild_id) if i.guild else '0', 'server_button'),
+        style=discord.ButtonStyle.link,
+        url='https://discord.gg/invite'
+    ))
+
     await i.response.send_message(embed=e, view=view)
 
 
@@ -3720,7 +4091,6 @@ async def send_dm(i: discord.Interaction, user_id: str, message: str):
     ALLOWED_DEV_IDS = [1436760469980450816]
     if i.user.id not in ALLOWED_DEV_IDS:
         return await i.response.send_message('❌ Эта команда только для разработчиков!', ephemeral=True)
-    if await check_tech_work(i): return
     try:
         user_id_int = int(user_id)
         user = await bot.fetch_user(user_id_int)
@@ -3754,7 +4124,6 @@ WHITELIST_USERS = [1436760469980450816]
 ])
 async def regex_cmd(i: discord.Interaction, attribute: app_commands.Choice[str]):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if not i.user.guild_permissions.administrator:
         return await i.response.send_message('❌ Нет прав!', ephemeral=True)
     settings = load_regex_settings()
@@ -3916,7 +4285,6 @@ async def on_message_edit(before, after):
 @bot.tree.command(name='servers', description='Показать список серверов и их владельцев')
 async def servers_cmd(i: discord.Interaction):
     if await check_blacklist(i): return
-    if await check_tech_work(i): return
     if i.user.id != VIP_USER_ID:
         return await i.response.send_message('❌ Эта команда только для разработчика!', ephemeral=True)
     embed = discord.Embed(title='📊 Список серверов с ботом', color=discord.Color.blue(), timestamp=datetime.now())
@@ -4336,6 +4704,1258 @@ async def leave_guild(ctx, guild_id: str = None):
         await ctx.send(f"❌ Произошла ошибка: {e}")
 
 
+# =====================================================
+# 🔥 АХЕРЕННАЯ DEV ПАНЕЛЬ ДЛЯ ЛС 🔥
+# =====================================================
+
+@bot.command(name='dev')
+async def dev_menu(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в личных сообщениях с ботом!")
+        return
+
+    # Красивый Embed с градиентом (через поля)
+    embed = discord.Embed(
+        title=" **ADMIN PANEL** ",
+        description="**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**\n"
+                    "👑 **Добро пожаловать, Владелец бота!**\n"
+                    "**━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━**\n\n"
+                    "🎮 **Выбери команду из меню ниже**\n"
+                    "⚡ **Управляй ботом как хочешь!**",
+        color=discord.Color.purple(),
+        timestamp=datetime.now()
+    )
+
+    # Статистика в красивом формате
+    total_members = sum(g.member_count for g in bot.guilds)
+    embed.add_field(
+        name="📊 **━━━━━━ СТАТИСТИКА ━━━━━━**",
+        value=f"```yml\n"
+              f"• Серверов:    {len(bot.guilds)}\n"
+              f"• Пользователей: {total_members}\n"
+              f"• Команд:      {len(bot.tree.get_commands())}\n"
+              f"• Пинг:        {round(bot.latency * 1000)} ms\n"
+              f"• uptime:      {str(datetime.now() - start_time).split('.')[0]}\n"
+              f"• Память:      {round(os.getpid() / 1024 / 1024, 2)} MB```",
+        inline=False
+    )
+
+    embed.add_field(
+        name="⚡ **━━━━━ БЫСТРЫЕ КОМАНДЫ ━━━━━**",
+        value="```fix\n"
+              "📊 !servers      - Список серверов\n"
+              "📈 !stats       - Детальная статистика\n"
+              "💬 !say         - Отправить сообщение\n"
+              "📨 !dm          - ЛС пользователю\n"
+              "📢 !broadcast   - Массовая рассылка\n"
+              "🚪 !leaveg      - Покинуть сервер\n"
+              "⚡ !eval        - Выполнить код\n"
+              "🗑️ !clear       - Очистить чат\n"
+              "🎨 !embed       - Красивый embed\n"
+              "📋 !announce    - Анонс на сервер\n"
+              "🔧 !gcmd        - Глобальная команда\n"
+              "💾 !backup      - Бэкап настроек```",
+        inline=False
+    )
+
+    embed.add_field(
+        name="📋 **━━━━━ ИНФОРМАЦИЯ ━━━━━**",
+        value=f"```py\n"
+              f"Бот:     {bot.user.name}\n"
+              f"ID:      {bot.user.id}\n"
+              f"Разработчик:  @{ctx.author.name}\n"
+              f"Версия:  v3.0.0```",
+        inline=False
+    )
+
+    embed.set_footer(text="Warden Bot | ADMIN ПАНЕЛЬ ", icon_url=bot.user.avatar.url)
+    embed.set_thumbnail(url=bot.user.avatar.url)
+
+    # Класс для меню с кучей опций
+    class DevSelect(discord.ui.Select):
+        def __init__(self):
+            options = [
+                discord.SelectOption(label="📊 Список серверов", value="servers",
+                                     description="Показать все серверы с ID", emoji="📊"),
+                discord.SelectOption(label="📈 Детальная статистика", value="stats",
+                                     description="Полная статистика бота", emoji="📈"),
+                discord.SelectOption(label="💬 Отправить сообщение", value="say",
+                                     description="Отправить сообщение в канал", emoji="💬"),
+                discord.SelectOption(label="🎨 Красивый embed", value="embed", description="Отправить красивый embed",
+                                     emoji="🎨"),
+                discord.SelectOption(label="📨 ЛС пользователю", value="dm",
+                                     description="Отправить ЛС любому пользователю", emoji="📨"),
+                discord.SelectOption(label="📢 Массовая рассылка", value="broadcast",
+                                     description="Рассылка по всем серверам", emoji="📢"),
+                discord.SelectOption(label="📋 Анонс на сервер", value="announce", description="Анонс в системный канал",
+                                     emoji="📋"),
+                discord.SelectOption(label="🚪 Покинуть сервер", value="leave", description="Бот покидает сервер",
+                                     emoji="🚪"),
+                discord.SelectOption(label="⚡ Выполнить код", value="eval", description="Выполнить Python код",
+                                     emoji="⚡"),
+                discord.SelectOption(label="🗑️ Очистить чат", value="clear", description="Очистить текущий канал",
+                                     emoji="🗑️"),
+                discord.SelectOption(label="🔧 Добавить команду", value="gcmd",
+                                     description="Добавить глобальную команду", emoji="🔧"),
+                discord.SelectOption(label="💾 Сделать бэкап", value="backup", description="Создать бэкап настроек",
+                                     emoji="💾"),
+                discord.SelectOption(label="🔄 Перезагрузить", value="reload", description="Перезагрузить команды",
+                                     emoji="🔄"),
+                discord.SelectOption(label="❌ Закрыть", value="cancel", description="Закрыть меню", emoji="❌"),
+            ]
+            super().__init__(placeholder="🔽 ВЫБЕРИ КОМАНДУ 🔽", options=options, min_values=1, max_values=1)
+
+        async def callback(self, select_interaction: discord.Interaction):
+            if select_interaction.user.id != ctx.author.id:
+                return await select_interaction.response.send_message("❌ Это меню не для тебя!", ephemeral=True)
+
+            selected = self.values[0]
+
+            commands = {
+                "servers": show_servers,
+                "stats": show_stats,
+                "say": ask_for_say,
+                "embed": ask_for_embed,
+                "dm": ask_for_dm,
+                "broadcast": ask_for_broadcast,
+                "announce": ask_for_announce,
+                "leave": ask_for_leave,
+                "eval": ask_for_eval,
+                "clear": ask_for_clear,
+                "gcmd": ask_for_gcmd,
+                "backup": ask_for_backup,
+                "reload": ask_for_reload,
+                "cancel": cancel_menu,
+            }
+
+            if selected in commands:
+                await commands[selected](select_interaction)
+
+    class DevView(discord.ui.View):
+        def __init__(self):
+            super().__init__(timeout=120)
+            self.add_item(DevSelect())
+
+        async def on_timeout(self):
+            for item in self.children:
+                item.disabled = True
+            await self.message.edit(view=self)
+
+    view = DevView()
+    view.message = await ctx.send(embed=embed, view=view)
+
+
+# =====================================================
+# 🎨 ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ МЕНЮ
+# =====================================================
+
+async def show_servers(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📊 **СПИСОК СЕРВЕРОВ**",
+        description=f"```yml\nВсего серверов: {len(bot.guilds)}```",
+        color=discord.Color.blue(),
+        timestamp=datetime.now()
+    )
+
+    for guild in list(bot.guilds)[:25]:  # Ограничим 25 серверами
+        owner = guild.owner
+        is_my = "👑" if owner and owner.id == interaction.user.id else "🔹"
+        embed.add_field(
+            name=f"{is_my} {guild.name}",
+            value=f"🆔 `{guild.id}`\n👥 {guild.member_count} участников",
+            inline=True
+        )
+
+    if len(bot.guilds) > 25:
+        embed.set_footer(text=f"Показано 25 из {len(bot.guilds)} серверов")
+
+    class CloseView(discord.ui.View):
+        @discord.ui.button(label="🔒 Закрыть", style=discord.ButtonStyle.danger)
+        async def close(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Панель закрыта", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=CloseView())
+
+
+async def show_stats(interaction: discord.Interaction):
+    total_members = sum(g.member_count for g in bot.guilds)
+    total_channels = sum(len(g.channels) for g in bot.guilds)
+    total_roles = sum(len(g.roles) for g in bot.guilds)
+    total_emojis = sum(len(g.emojis) for g in bot.guilds)
+
+    embed = discord.Embed(
+        title="📈 **ДЕТАЛЬНАЯ СТАТИСТИКА**",
+        color=discord.Color.green(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(
+        name="🖥️ **Сервера**",
+        value=f"```yaml\n{len(bot.guilds)} серверов```",
+        inline=True
+    )
+    embed.add_field(
+        name="👥 **Пользователи**",
+        value=f"```yaml\n{total_members} всего```",
+        inline=True
+    )
+    embed.add_field(
+        name="📁 **Каналы**",
+        value=f"```yaml\n{total_channels} каналов```",
+        inline=True
+    )
+    embed.add_field(
+        name="🎭 **Роли**",
+        value=f"```yaml\n{total_roles} ролей```",
+        inline=True
+    )
+    embed.add_field(
+        name="😀 **Эмодзи**",
+        value=f"```yaml\n{total_emojis} эмодзи```",
+        inline=True
+    )
+    embed.add_field(
+        name="⚙️ **Команды**",
+        value=f"```yaml\n{len(bot.tree.get_commands())} команд```",
+        inline=True
+    )
+    embed.add_field(
+        name="🟢 **Пинг**",
+        value=f"```yaml\n{round(bot.latency * 1000)} ms```",
+        inline=True
+    )
+    embed.add_field(
+        name="⏰ **uptime**",
+        value=f"```yaml\n{str(datetime.now() - start_time).split('.')[0]}```",
+        inline=True
+    )
+    embed.add_field(
+        name="💾 **Память**",
+        value=f"```yaml\n{round(os.getpid() / 1024 / 1024, 2)} MB```",
+        inline=True
+    )
+    embed.set_footer(text="Warden Bot | 🔥 АХЕРЕННАЯ СТАТИСТИКА 🔥")
+
+    class CloseView(discord.ui.View):
+        @discord.ui.button(label="🔒 Закрыть", style=discord.ButtonStyle.danger)
+        async def close(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Панель закрыта", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=CloseView())
+
+
+async def ask_for_say(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="💬 **ОТПРАВИТЬ СООБЩЕНИЕ**",
+        description="```fix\n!say <ID_КАНАЛА> <ТЕКСТ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!say 123456789 Привет всем!```\n\n"
+                    "📝 **Как получить ID канала?**\n"
+                    "Включи режим разработчика → ПКМ по каналу → Копировать ID",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Warden Bot | 💬 Команда say")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_embed(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🎨 **ОТПРАВИТЬ EMBED**",
+        description="```fix\n!embed <ID_КАНАЛА> <ЗАГОЛОВОК> | <ОПИСАНИЕ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!embed 123456789 Важно! | Это важное сообщение```\n\n"
+                    "📝 **Разделитель:** `|` между заголовком и описанием",
+        color=discord.Color.purple()
+    )
+    embed.set_footer(text="Warden Bot | 🎨 Команда embed")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_dm(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📨 **ЛС ПОЛЬЗОВАТЕЛЮ**",
+        description="```fix\n!dm <ID_ПОЛЬЗОВАТЕЛЯ> <ТЕКСТ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!dm 123456789 Привет! Как дела?```\n\n"
+                    "📝 **Как получить ID пользователя?**\n"
+                    "Включи режим разработчика → ПКМ по пользователю → Копировать ID",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Warden Bot | 📨 Команда dm")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_broadcast(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📢 **МАССОВАЯ РАССЫЛКА**",
+        description="```fix\n!broadcast <ТЕКСТ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!broadcast Внимание! У бота новое обновление!```\n\n"
+                    "⚠️ **Сообщение будет отправлено на ВСЕ сервера!**",
+        color=discord.Color.orange()
+    )
+    embed.set_footer(text="Warden Bot | 📢 Команда broadcast")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_announce(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="📋 **АНОНС НА СЕРВЕР**",
+        description="```fix\n!announce <ID_СЕРВЕРА> <ТЕКСТ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!announce 123456789 Внимание! Важное объявление!```\n\n"
+                    "📝 Анонс будет отправлен в **системный канал** сервера",
+        color=discord.Color.green()
+    )
+    embed.set_footer(text="Warden Bot | 📋 Команда announce")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_leave(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🚪 **ПОКИНУТЬ СЕРВЕР**",
+        description="```fix\n!leaveg <ID_СЕРВЕРА>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!leaveg 123456789```\n\n"
+                    "⚠️ **ВНИМАНИЕ!**\n"
+                    "Бот **навсегда покинет сервер**! Вернуть можно только через повторное приглашение.",
+        color=discord.Color.red()
+    )
+    embed.add_field(name="📝 Как получить ID сервера?",
+                    value="Включи режим разработчика → ПКМ по серверу → Копировать ID", inline=False)
+    embed.set_footer(text="Warden Bot | 🚪 Команда leaveg")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_eval(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="⚡ **ВЫПОЛНИТЬ PYTHON КОД**",
+        description="```fix\n!eval <КОД>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!eval print('Hello World!')```\n\n"
+                    "**Многострочный код:**\n"
+                    "```py\n!eval \nfor i in range(5):\n    print(i)```\n\n"
+                    "⚠️ **ОСТОРОЖНО!**\n"
+                    "Неправильный код может сломать бота!",
+        color=discord.Color.red()
+    )
+    embed.set_footer(text="Warden Bot | ⚡ Команда eval")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_clear(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🗑️ **ОЧИСТИТЬ ЧАТ**",
+        description="```fix\n!clear <КОЛИЧЕСТВО>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n!clear 50```\n\n"
+                    "📊 **Лимит:** максимум 100 сообщений\n"
+                    "📍 **Работает только на сервере, не в ЛС!**",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Warden Bot | 🗑️ Команда clear")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_gcmd(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🔧 **ДОБАВИТЬ ГЛОБАЛЬНУЮ КОМАНДУ**",
+        description="```fix\n/gcmd <НАЗВАНИЕ> <ОПИСАНИЕ>\n```\n"
+                    "**Пример:**\n"
+                    "```py\n/gcmd hello Приветствие от бота```\n\n"
+                    "✨ Команда появится на **всех серверах** после перезапуска!",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text="Warden Bot | 🔧 Команда gcmd")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_backup(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="💾 **СОЗДАТЬ БЭКАП**",
+        description="```fix\n!backup\n```\n\n"
+                    "📦 **Будут сохранены:**\n"
+                    "• Все настройки бота (JSON файлы)\n"
+                    "• Список серверов и участников\n"
+                    "• Конфигурация команд\n\n"
+                    "✅ Бэкап отправится сюда в ЛС!",
+        color=discord.Color.green()
+    )
+    embed.set_footer(text="Warden Bot | 💾 Команда backup")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def ask_for_reload(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🔄 **ПЕРЕЗАГРУЗИТЬ КОМАНДЫ**",
+        description="```fix\n!reload\n```\n\n"
+                    "🔄 **Что произойдёт:**\n"
+                    "• Синхронизация слеш-команд\n"
+                    "• Перезагрузка всех команд бота\n"
+                    "• Обновление статуса\n\n"
+                    "⏱️ Процесс займёт несколько секунд!",
+        color=discord.Color.orange()
+    )
+    embed.set_footer(text="Warden Bot | 🔄 Команда reload")
+
+    class ActionView(discord.ui.View):
+        @discord.ui.button(label="❌ Отмена", style=discord.ButtonStyle.danger)
+        async def cancel(self, btn_i: discord.Interaction, button: discord.ui.Button):
+            await btn_i.response.edit_message(content="🔒 Команда отменена", embed=None, view=None)
+
+    await interaction.response.edit_message(embed=embed, view=ActionView())
+
+
+async def cancel_menu(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="🔒 **МЕНЮ ЗАКРЫТО**",
+        description="Для вызова меню снова напишите `!dev`",
+        color=discord.Color.red()
+    )
+    await interaction.response.edit_message(embed=embed, view=None)
+
+
+# =====================================================
+# 🔧 ОСНОВНЫЕ КОМАНДЫ (РАБОТАЮТ В ЛС)
+# =====================================================
+
+@bot.command(name='servers')
+async def dev_servers(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    embed = discord.Embed(
+        title="📊 Список серверов",
+        description=f"Всего серверов: **{len(bot.guilds)}**",
+        color=discord.Color.blue(),
+        timestamp=datetime.now()
+    )
+
+    for guild in bot.guilds:
+        owner = guild.owner
+        is_my = "👑 **ВАШ**" if owner and owner.id == ctx.author.id else ""
+        embed.add_field(
+            name=f"{guild.name}",
+            value=f"🆔 ID: `{guild.id}`\n👑 Владелец: {owner.name if owner else 'Неизвестен'}\n👥 Участников: {guild.member_count}\n{is_my}",
+            inline=False
+        )
+
+    await ctx.send(embed=embed)
+
+
+# =====================================================
+# 🔥 ДОПОЛНИТЕЛЬНЫЕ КОМАНДЫ ДЛЯ DEV ПАНЕЛИ 🔥
+# =====================================================
+
+# 1️⃣ !embed - Отправить красивый embed
+@bot.command(name='embed')
+async def dev_embed(ctx, channel_id: int, *, title_desc: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    # Разделяем заголовок и описание через |
+    if "|" not in title_desc:
+        await ctx.send("❌ Используй формат: `!embed <ID> <ЗАГОЛОВОК> | <ОПИСАНИЕ>`")
+        return
+
+    title, description = title_desc.split("|", 1)
+    title = title.strip()
+    description = description.strip()
+
+    channel = bot.get_channel(channel_id)
+    if not channel:
+        await ctx.send("❌ Канал не найден!")
+        return
+
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=discord.Color.blue(),
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text=f"Отправлено через Warden Bot")
+
+    await channel.send(embed=embed)
+    await ctx.send(f"✅ Embed отправлен в канал `{channel.name}` (ID: {channel_id})")
+
+
+# 2️⃣ !announce - Анонс на сервер
+@bot.command(name='announce')
+async def dev_announce(ctx, guild_id: int, *, message: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    guild = bot.get_guild(guild_id)
+    if not guild:
+        await ctx.send(f"❌ Сервер с ID `{guild_id}` не найден!")
+        return
+
+    # Ищем системный канал или первый текстовый
+    channel = guild.system_channel or guild.text_channels[0]
+    if not channel:
+        await ctx.send(f"❌ На сервере **{guild.name}** нет доступных каналов!")
+        return
+
+    embed = discord.Embed(
+        title="📢 **АНОНС**",
+        description=message,
+        color=discord.Color.gold(),
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text="Warden Bot | Администрация")
+
+    await channel.send(embed=embed)
+    await ctx.send(f"✅ Анонс отправлен на сервер **{guild.name}** в канал `{channel.name}`")
+
+
+# 3️⃣ !gcmd - Добавить глобальную команду (сохраняется в файл)
+@bot.command(name='gcmd')
+async def dev_gcmd(ctx, name: str, *, description: str = "Нет описания"):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    # Файл для хранения пользовательских команд
+    CUSTOM_COMMANDS_FILE = 'custom_commands.json'
+
+    def load_custom_commands():
+        if os.path.exists(CUSTOM_COMMANDS_FILE):
+            with open(CUSTOM_COMMANDS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {}
+
+    def save_custom_commands(cmds):
+        with open(CUSTOM_COMMANDS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(cmds, f, indent=4, ensure_ascii=False)
+
+    # Создаём команду
+    @bot.tree.command(name=name, description=description)
+    async def custom_cmd(i: discord.Interaction):
+        await i.response.send_message(f"✅ Команда `/{name}` работает! (пока без логики)", ephemeral=True)
+
+    # Сохраняем информацию о команде
+    cmds = load_custom_commands()
+    cmds[name] = {'description': description, 'created': str(datetime.now())}
+    save_custom_commands(cmds)
+
+    # Синхронизация
+    try:
+        await bot.tree.sync()
+        embed = discord.Embed(
+            title="✅ Глобальная команда создана",
+            description=f"**/{name}** - {description}",
+            color=discord.Color.green()
+        )
+        embed.add_field(name="📝 Примечание", value="Команда появится на всех серверах в течение нескольких минут",
+                        inline=False)
+        await ctx.send(embed=embed)
+    except Exception as e:
+        await ctx.send(f"❌ Ошибка при создании команды: {e}")
+
+
+# =====================================================
+# 💾 !backup - СОЗДАНИЕ БЭКАПА СЕРВЕРА
+# =====================================================
+@bot.command(name='backup')
+async def dev_backup(ctx, guild_id: int = None):
+    # Проверка - только для разработчика
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС с ботом!")
+        return
+
+    # Если ID не указан, берём первый сервер из списка
+    if guild_id is None:
+        if len(bot.guilds) == 0:
+            await ctx.send("❌ Бот не состоит ни на одном сервере!")
+            return
+        guild = bot.guilds[0]
+        await ctx.send(f"⚠️ ID сервера не указан! Создаю бэкап сервера **{guild.name}** (ID: {guild.id})")
+    else:
+        guild = bot.get_guild(guild_id)
+        if not guild:
+            await ctx.send(f"❌ Сервер с ID `{guild_id}` не найден!")
+            return
+
+    await ctx.send(f"📦 **Начинаю создание бэкапа сервера `{guild.name}`...**\nЭто может занять некоторое время ⏳")
+
+    # Структура для хранения данных сервера
+    backup_data = {
+        'backup_info': {
+            'created_at': str(datetime.now()),
+            'server_name': guild.name,
+            'server_id': guild.id,
+            'owner_id': guild.owner_id,
+            'owner_name': str(guild.owner) if guild.owner else 'Unknown',
+            'member_count': guild.member_count,
+            'bot_name': bot.user.name,
+            'bot_id': bot.user.id
+        },
+        'roles': [],
+        'categories': [],
+        'channels': [],
+        'emojis': [],
+        'stickers': []
+    }
+
+    # 1️⃣ СОХРАНЯЕМ РОЛИ
+    await ctx.send("📋 Сохраняю роли...")
+    for role in guild.roles:
+        backup_data['roles'].append({
+            'name': role.name,
+            'id': role.id,
+            'color': role.color.value,
+            'position': role.position,
+            'hoist': role.hoist,
+            'mentionable': role.mentionable,
+            'permissions': role.permissions.value,
+            'created_at': str(role.created_at)
+        })
+
+    # 2️⃣ СОХРАНЯЕМ КАТЕГОРИИ
+    await ctx.send("📁 Сохраняю категории...")
+    for category in guild.categories:
+        backup_data['categories'].append({
+            'name': category.name,
+            'id': category.id,
+            'position': category.position,
+            'created_at': str(category.created_at)
+        })
+
+    # 3️⃣ СОХРАНЯЕМ КАНАЛЫ
+    await ctx.send("💬 Сохраняю каналы...")
+    for channel in guild.channels:
+        if isinstance(channel, discord.TextChannel):
+            backup_data['channels'].append({
+                'type': 'text',
+                'name': channel.name,
+                'id': channel.id,
+                'category_id': channel.category_id,
+                'position': channel.position,
+                'topic': channel.topic,
+                'slowmode_delay': channel.slowmode_delay,
+                'is_nsfw': channel.is_nsfw(),
+                'created_at': str(channel.created_at)
+            })
+        elif isinstance(channel, discord.VoiceChannel):
+            backup_data['channels'].append({
+                'type': 'voice',
+                'name': channel.name,
+                'id': channel.id,
+                'category_id': channel.category_id,
+                'position': channel.position,
+                'bitrate': channel.bitrate,
+                'user_limit': channel.user_limit,
+                'created_at': str(channel.created_at)
+            })
+
+    # 4️⃣ СОХРАНЯЕМ ЭМОДЗИ
+    await ctx.send("😀 Сохраняю эмодзи...")
+    for emoji in guild.emojis:
+        backup_data['emojis'].append({
+            'name': emoji.name,
+            'id': emoji.id,
+            'animated': emoji.animated,
+            'created_at': str(emoji.created_at)
+        })
+
+    # 5️⃣ СОХРАНЯЕМ СТИКЕРЫ
+    await ctx.send("🎨 Сохраняю стикеры...")
+    for sticker in guild.stickers:
+        backup_data['stickers'].append({
+            'name': sticker.name,
+            'id': sticker.id,
+            'description': sticker.description,
+            'created_at': str(sticker.created_at)
+        })
+
+    # 6️⃣ СОХРАНЯЕМ НАСТРОЙКИ БОТА (JSON файлы)
+    await ctx.send("⚙️ Сохраняю настройки бота...")
+
+    settings_files = [
+        'lang_settings.json',
+        'warden_settings.json',
+        'logs_settings.json',
+        'captcha_settings.json',
+        'welcome_settings.json',
+        'warns.json',
+        'tickets.json',
+        'ticket_settings.json',
+        'reaction_roles.json',
+        'autorole_settings.json',
+        'regex_settings.json',
+        'applications.json'
+    ]
+
+    backup_data['bot_settings'] = {}
+    for file in settings_files:
+        if os.path.exists(file):
+            try:
+                with open(file, 'r', encoding='utf-8') as f:
+                    backup_data['bot_settings'][file] = json.load(f)
+            except:
+                backup_data['bot_settings'][file] = f"Ошибка при чтении файла {file}"
+
+    # 7️⃣ СОЗДАЁМ JSON ФАЙЛ
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    backup_filename = f"backup_{guild.name}_{guild.id}_{timestamp}.json"
+
+    # Очищаем имя файла от недопустимых символов
+    import re
+    backup_filename = re.sub(r'[<>:"/\\|?*]', '_', backup_filename)
+
+    with open(backup_filename, 'w', encoding='utf-8') as f:
+        json.dump(backup_data, f, indent=4, ensure_ascii=False)
+
+    # 8️⃣ ОТПРАВЛЯЕМ ФАЙЛ В ЛС
+    file_size = os.path.getsize(backup_filename) / 1024  # в KB
+
+    embed = discord.Embed(
+        title="💾 **БЭКАП СОЗДАН**",
+        description=f"✅ Сервер: **{guild.name}**\n"
+                    f"🆔 ID: `{guild.id}`\n"
+                    f"📅 Дата: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n"
+                    f"📦 Размер: `{round(file_size, 2)} KB`\n\n"
+                    f"**📊 Статистика бэкапа:**\n"
+                    f"• Ролей: `{len(backup_data['roles'])}`\n"
+                    f"• Категорий: `{len(backup_data['categories'])}`\n"
+                    f"• Каналов: `{len(backup_data['channels'])}`\n"
+                    f"• Эмодзи: `{len(backup_data['emojis'])}`\n"
+                    f"• Стикеров: `{len(backup_data['stickers'])}`\n"
+                    f"• Файлов настроек: `{len(backup_data['bot_settings'])}`",
+        color=discord.Color.green(),
+        timestamp=datetime.now()
+    )
+    embed.set_footer(text="Warden Bot | 🔥 Бэкап сервера")
+
+    await ctx.send(embed=embed)
+
+    # Отправляем файл
+    with open(backup_filename, 'rb') as f:
+        await ctx.send(file=discord.File(f, backup_filename))
+
+    # 9️⃣ УДАЛЯЕМ ВРЕМЕННЫЙ ФАЙЛ
+    os.remove(backup_filename)
+
+    await ctx.send("✅ **Бэкап завершён!** Файл сохранён в этом чате. Храни его в надёжном месте.")
+
+
+# =====================================================
+# 🔄 !restore - ВОССТАНОВЛЕНИЕ СЕРВЕРА ПО ID ИЗ БЭКАПА
+# =====================================================
+@bot.command(name='restore')
+async def dev_restore(ctx, guild_id: int = None):
+    # Проверка - только для разработчика
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС с ботом!")
+        return
+
+    # Если ID не указан, показываем список серверов
+    if guild_id is None:
+        embed = discord.Embed(
+            title="📋 **СПИСОК ДОСТУПНЫХ СЕРВЕРОВ**",
+            description="Выбери сервер для восстановления и введи команду:\n`!restore <ID_СЕРВЕРА>`",
+            color=discord.Color.blue()
+        )
+
+        for guild in list(bot.guilds)[:25]:
+            owner = guild.owner
+            embed.add_field(
+                name=f"🔹 {guild.name}",
+                value=f"🆔 ID: `{guild.id}`\n👑 Владелец: {owner.name if owner else 'Неизвестен'}\n👥 Участников: {guild.member_count}",
+                inline=False
+            )
+
+        if len(bot.guilds) > 25:
+            embed.set_footer(text=f"Показано 25 из {len(bot.guilds)} серверов")
+
+        await ctx.send(embed=embed)
+        return
+
+    # Ищем сервер по ID
+    guild = bot.get_guild(guild_id)
+    if not guild:
+        await ctx.send(
+            f"❌ Сервер с ID `{guild_id}` не найден!\n\n📝 **Как получить ID сервера?**\n1. Включи режим разработчика в Discord\n2. ПКМ по серверу → Копировать ID\n3. Используй команду `!restore` без ID для списка серверов")
+        return
+
+    await ctx.send(f"📂 **Восстановление для сервера `{guild.name}` (ID: `{guild.id}`)**\n\n"
+                   f"📤 **Отправьте JSON файл бэкапа в этот чат**\n"
+                   f"(файл должен быть получен от команды `!backup <ID>`)\n\n"
+                   f"⚠️ **ВНИМАНИЕ!** Восстановление перезапишет текущие настройки бота для этого сервера!")
+
+    def check(msg):
+        return msg.author.id == ctx.author.id and msg.channel == ctx.channel and msg.attachments
+
+    try:
+        msg = await bot.wait_for('message', timeout=60.0, check=check)
+
+        attachment = msg.attachments[0]
+        if not attachment.filename.endswith('.json'):
+            await ctx.send("❌ Неверный формат файла! Нужен JSON файл.")
+            return
+
+        # Скачиваем файл
+        await attachment.save(f"restore_{attachment.filename}")
+
+        with open(f"restore_{attachment.filename}", 'r', encoding='utf-8') as f:
+            backup_data = json.load(f)
+
+        # Проверяем, что бэкап для правильного сервера
+        backup_server_id = backup_data['backup_info']['server_id']
+        if backup_server_id != guild_id:
+            await ctx.send(
+                f"❌ Этот бэкап для сервера **{backup_data['backup_info']['server_name']}** (ID: `{backup_server_id}`)\n"
+                f"А вы пытаетесь восстановить сервер **{guild.name}** (ID: `{guild_id}`)\n\n"
+                f"Используйте правильный бэкап или укажите другой ID!")
+            os.remove(f"restore_{attachment.filename}")
+            return
+
+        embed = discord.Embed(
+            title="📂 **БЭКАП ЗАГРУЖЕН**",
+            description=f"✅ Сервер: **{backup_data['backup_info']['server_name']}**\n"
+                        f"🆔 ID: `{backup_data['backup_info']['server_id']}`\n"
+                        f"📅 Дата создания: {backup_data['backup_info']['created_at']}\n"
+                        f"👥 Участников на момент бэкапа: {backup_data['backup_info']['member_count']}",
+            color=discord.Color.green()
+        )
+        await ctx.send(embed=embed)
+
+        # Восстанавливаем настройки бота для конкретного сервера
+        restored_count = 0
+        if 'bot_settings' in backup_data:
+            for file, data in backup_data['bot_settings'].items():
+                if isinstance(data, dict):
+                    # Загружаем существующие настройки
+                    if os.path.exists(file):
+                        with open(file, 'r', encoding='utf-8') as f:
+                            current_settings = json.load(f)
+                    else:
+                        current_settings = {}
+
+                    # Обновляем настройки для конкретного сервера
+                    current_settings[str(guild_id)] = data.get(str(guild_id), data)
+
+                    with open(file, 'w', encoding='utf-8') as f:
+                        json.dump(current_settings, f, indent=4, ensure_ascii=False)
+                    restored_count += 1
+
+            await ctx.send(f"✅ Восстановлено **{restored_count}** файлов настроек для сервера `{guild.name}`!")
+
+        # Отдельно восстанавливаем информацию о сервере
+        server_info_file = f"server_backup_{guild.id}.json"
+        with open(server_info_file, 'w', encoding='utf-8') as f:
+            json.dump(backup_data, f, indent=4, ensure_ascii=False)
+
+        # Удаляем временный файл
+        os.remove(f"restore_{attachment.filename}")
+
+        # Показываем информацию о восстановленных данных
+        info_embed = discord.Embed(
+            title="📊 **СТАТИСТИКА ВОССТАНОВЛЕНИЯ**",
+            description=f"**Сервер:** {guild.name}\n**ID:** `{guild.id}`",
+            color=discord.Color.blue()
+        )
+        info_embed.add_field(name="🏷️ Роли в бэкапе", value=f"`{len(backup_data['roles'])}` ролей", inline=True)
+        info_embed.add_field(name="📁 Категории", value=f"`{len(backup_data['categories'])}`", inline=True)
+        info_embed.add_field(name="💬 Каналы", value=f"`{len(backup_data['channels'])}`", inline=True)
+        info_embed.add_field(name="😀 Эмодзи", value=f"`{len(backup_data['emojis'])}`", inline=True)
+        info_embed.add_field(name="🎨 Стикеры", value=f"`{len(backup_data['stickers'])}`", inline=True)
+        info_embed.add_field(name="⚙️ Файлов настроек", value=f"`{restored_count}`", inline=True)
+
+        await ctx.send(embed=info_embed)
+
+        await ctx.send(f"✅ **Восстановление завершено!**\n"
+                       f"📁 Полный бэкап сохранён в файл `{server_info_file}`\n"
+                       f"⚠️ Для применения изменений перезапустите бота!")
+
+    except asyncio.TimeoutError:
+        await ctx.send("⏰ Время вышло. Операция отменена.")
+    except Exception as e:
+        await ctx.send(f"❌ Ошибка: {e}")
+
+
+# =====================================================
+# 📋 !listbackups - СПИСОК СОХРАНЁННЫХ БЭКАПОВ
+# =====================================================
+@bot.command(name='listbackups')
+async def dev_listbackups(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС с ботом!")
+        return
+
+    import glob
+    backup_files = glob.glob("server_backup_*.json")
+
+    if not backup_files:
+        await ctx.send("❌ Нет сохранённых бэкапов!")
+        return
+
+    embed = discord.Embed(
+        title="📋 **СПИСОК БЭКАПОВ**",
+        description=f"Найдено бэкапов: **{len(backup_files)}**",
+        color=discord.Color.blue()
+    )
+
+    for file in backup_files:
+        try:
+            with open(file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            server_name = data['backup_info']['server_name']
+            server_id = data['backup_info']['server_id']
+            created_at = data['backup_info']['created_at']
+            file_size = os.path.getsize(file) / 1024
+
+            embed.add_field(
+                name=f"🔹 {server_name}",
+                value=f"🆔 ID: `{server_id}`\n📅 Создан: {created_at[:19]}\n📦 Размер: `{round(file_size, 2)} KB`",
+                inline=False
+            )
+        except:
+            embed.add_field(name=f"🔹 {file}", value="❌ Ошибка чтения файла", inline=False)
+
+    await ctx.send(embed=embed)
+
+
+# =====================================================
+# 🗑️ !delbackup - УДАЛЕНИЕ БЭКАПА
+# =====================================================
+@bot.command(name='delbackup')
+async def dev_delbackup(ctx, guild_id: int):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС с ботом!")
+        return
+
+    backup_file = f"server_backup_{guild_id}.json"
+
+    if not os.path.exists(backup_file):
+        await ctx.send(f"❌ Бэкап для сервера с ID `{guild_id}` не найден!")
+        return
+
+    os.remove(backup_file)
+    await ctx.send(f"✅ Бэкап для сервера ID `{guild_id}` удалён!")
+
+
+# 5️⃣ !reload - Перезагрузить команды
+@bot.command(name='reload')
+async def dev_reload(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    await ctx.send("🔄 **Перезагрузка команд...**")
+
+    try:
+        # Синхронизация команд
+        synced = await bot.tree.sync()
+        await ctx.send(
+            f"✅ **Готово!**\n📊 Синхронизировано команд: {len(synced)}\n🕐 Время: {datetime.now().strftime('%H:%M:%S')}")
+    except Exception as e:
+        await ctx.send(f"❌ Ошибка при синхронизации: {e}")
+
+    # Обновляем статус
+    await update_status()
+    await ctx.send("✅ Статус бота обновлён!")
+
+
+# 6️⃣ !listcmds - Показать все пользовательские команды
+@bot.command(name='listcmds')
+async def dev_listcmds(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    CUSTOM_COMMANDS_FILE = 'custom_commands.json'
+
+    if not os.path.exists(CUSTOM_COMMANDS_FILE):
+        await ctx.send("❌ Нет созданных пользовательских команд!")
+        return
+
+    with open(CUSTOM_COMMANDS_FILE, 'r', encoding='utf-8') as f:
+        cmds = json.load(f)
+
+    if not cmds:
+        await ctx.send("❌ Нет созданных пользовательских команд!")
+        return
+
+    embed = discord.Embed(
+        title="📋 **ПОЛЬЗОВАТЕЛЬСКИЕ КОМАНДЫ**",
+        description=f"Всего команд: {len(cmds)}",
+        color=discord.Color.blue()
+    )
+
+    for name, data in cmds.items():
+        embed.add_field(
+            name=f"/{name}",
+            value=f"📝 {data.get('description', 'Нет описания')}\n🕐 Создана: {data.get('created', 'Неизвестно')}",
+            inline=False
+        )
+
+    await ctx.send(embed=embed)
+
+
+# 7️⃣ !delcmd - Удалить пользовательскую команду
+@bot.command(name='delcmd')
+async def dev_delcmd(ctx, name: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    CUSTOM_COMMANDS_FILE = 'custom_commands.json'
+
+    if not os.path.exists(CUSTOM_COMMANDS_FILE):
+        await ctx.send("❌ Нет созданных пользовательских команд!")
+        return
+
+    with open(CUSTOM_COMMANDS_FILE, 'r', encoding='utf-8') as f:
+        cmds = json.load(f)
+
+    if name not in cmds:
+        await ctx.send(f"❌ Команда `/{name}` не найдена!")
+        return
+
+    # Удаляем команду
+    del cmds[name]
+
+    with open(CUSTOM_COMMANDS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(cmds, f, indent=4, ensure_ascii=False)
+
+    await ctx.send(f"✅ Команда `/{name}` удалена! Перезапусти бота для применения изменений.")
+
+
+@bot.command(name='stats')
+async def dev_stats(ctx):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    total_members = sum(g.member_count for g in bot.guilds)
+    total_channels = sum(len(g.channels) for g in bot.guilds)
+    total_roles = sum(len(g.roles) for g in bot.guilds)
+
+    embed = discord.Embed(
+        title="📊 Детальная статистика",
+        color=discord.Color.green(),
+        timestamp=datetime.now()
+    )
+    embed.add_field(name="🖥️ Серверов", value=f"`{len(bot.guilds)}`", inline=True)
+    embed.add_field(name="👥 Пользователей", value=f"`{total_members}`", inline=True)
+    embed.add_field(name="📁 Каналов", value=f"`{total_channels}`", inline=True)
+    embed.add_field(name="🎭 Ролей", value=f"`{total_roles}`", inline=True)
+    embed.add_field(name="⚙️ Команд", value=f"`{len(bot.tree.get_commands())}`", inline=True)
+    embed.add_field(name="🟢 Пинг", value=f"`{round(bot.latency * 1000)} ms`", inline=True)
+    embed.add_field(name="⏰ uptime", value=f"`{str(datetime.now() - start_time).split('.')[0]}`", inline=True)
+    embed.add_field(name="💾 Память", value=f"`{round(os.getpid() / 1024 / 1024, 2)} MB`", inline=True)
+    embed.set_footer(text="Warden Bot | DEV STATS")
+
+    await ctx.send(embed=embed)
+
+
+@bot.command(name='say')
+async def dev_say(ctx, channel_id: int, *, message: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    channel = bot.get_channel(channel_id)
+    if channel:
+        await channel.send(message)
+        await ctx.send(f"✅ Сообщение отправлено в канал `{channel.name}` (ID: {channel_id})")
+    else:
+        await ctx.send("❌ Канал не найден!")
+
+
+@bot.command(name='dm')
+async def dev_dm(ctx, user_id: int, *, message: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    try:
+        user = await bot.fetch_user(user_id)
+        await user.send(message)
+        await ctx.send(f"✅ Сообщение отправлено пользователю **{user.name}** (ID: {user_id})")
+    except discord.NotFound:
+        await ctx.send("❌ Пользователь не найден!")
+    except discord.Forbidden:
+        await ctx.send("❌ Не могу отправить сообщение (закрыты ЛС)")
+    except Exception as e:
+        await ctx.send(f"❌ Ошибка: {e}")
+
+
+@bot.command(name='broadcast')
+async def dev_broadcast(ctx, *, message: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    await ctx.send(f"📢 Начинаю рассылку на **{len(bot.guilds)}** серверов...")
+
+    success = 0
+    failed = 0
+
+    for guild in bot.guilds:
+        try:
+            channel = guild.system_channel or guild.text_channels[0]
+            await channel.send(f"📢 **Анонс от разработчика:**\n{message}")
+            success += 1
+            await asyncio.sleep(0.5)
+        except:
+            failed += 1
+
+    await ctx.send(f"✅ Рассылка завершена!\n• Успешно: {success}\n• Ошибок: {failed}")
+
+
+@bot.command(name='leaveg')
+async def dev_leave(ctx, guild_id: int):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    guild = bot.get_guild(guild_id)
+    if not guild:
+        await ctx.send(f"❌ Сервер с ID `{guild_id}` не найден!")
+        return
+
+    await ctx.send(f"👋 Покидаю сервер **{guild.name}** (ID: `{guild_id}`)...")
+    await guild.leave()
+    await ctx.send(f"✅ Бот покинул сервер **{guild.name}**")
+
+
+@bot.command(name='eval')
+async def dev_eval(ctx, *, code: str):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в ЛС!")
+        return
+
+    if code.startswith("```") and code.endswith("```"):
+        code = code[3:-3]
+        if code.startswith("python"):
+            code = code[6:]
+
+    try:
+        result = eval(code)
+        if result is not None:
+            await ctx.send(f"```\n{result}```")
+    except Exception as e:
+        await ctx.send(f"❌ Ошибка: ```\n{e}```")
+
+
+@bot.command(name='clear')
+async def dev_clear(ctx, amount: int = 10):
+    if ctx.author.id != 1436760469980450816:
+        return
+    if ctx.guild is not None:
+        await ctx.send("❌ Эта команда работает только в текущем канале на сервере!")
+        return
+
+    if amount > 100:
+        amount = 100
+
+    deleted = await ctx.channel.purge(limit=amount + 1)
+    msg = await ctx.send(f"🗑️ Удалено {len(deleted) - 1} сообщений")
+    await asyncio.sleep(2)
+    await msg.delete()
+
+
 @bot.event
 async def on_ready():
     print(f'✅ Bot {bot.user} is online!')
@@ -4365,7 +5985,6 @@ async def on_ready():
                     pass
 
     bot.loop.create_task(update_status())
-    bot.loop.create_task(tech_work_checker())
 
     for guild in bot.guilds:
         try:
